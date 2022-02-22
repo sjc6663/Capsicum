@@ -1,11 +1,11 @@
 ## Dada2 and phyloseq demo for Ganda lab
-# Emily Bean, 11/2020
+# Emily Bean, 11/2020 - updated for Capsicum by Stephanie Clouser 2/2022
 
 # ---- install and read data ----
 
 ### dada2 and phyloseq are both Bioconductor packages
 
-# test if Bioconductor is already installed
+# BiocManager was installed manually in packages tab
 
 # load package
 require(BiocManager)
