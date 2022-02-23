@@ -38,7 +38,7 @@ length(ourlist)
 #  set pathway to the database you prefer - we will use Greengenes
 ## NOTE:Github doesn't handle fastq.gz files well so download these locally
 # dada2 maintains a list of databases: https://benjjneb.github.io/dada2/training.html
-DB = "~/Desktop/gg_13_8_train_set_97.fa.gz"
+DB = "~/Downloads/silva_nr99_v138.1_train_set.fa"
 
 
 # paired end characterization; most Illumina files are sample names + "_R1_001.fastq" for forward reads
@@ -74,8 +74,8 @@ if(any(!fwdNames %in% revNames)) {
 ### ---- filterAndTrim ----
 
 # create subdirectory for filtered files
-filtForward <- file.path("./data/filtered", paste0(fwdNames, "_F_filt.fastq.gz"))
-filtReverse <- file.path("./data/filtered", paste0(revNames, "_R_filt.fastq.gz"))
+filtForward <- file.path("~/Desktop/16s-workshop/filtered", paste0(fwdNames, "_F_filt.fastq.gz"))
+filtReverse <- file.path("~/Desktop/16s-workshop/filtered", paste0(revNames, "_R_filt.fastq.gz"))
 
 ## Dada2 can plot Phred qualities but FastQC is much better
 plotQualityProfile(fwdFiles[1])
@@ -94,7 +94,7 @@ cleaned <- filterAndTrim(
 )
 
 # path to filtered and cleaned reads
-CLEANEDPATH = "./data/filtered/"
+CLEANEDPATH = "~/Desktop/16s-workshop/filtered/"
 
 # visualize the quality of filtered data on a forward & reverse read
 # in reality: do this step in FastQC as well
@@ -166,8 +166,20 @@ tax <- assignTaxonomy(seqs = seqtab.nochim,
                       verbose = TRUE)
 
 ## This is the end of the dada2 algorithm
+
+## --------phyloseq analysis-------------------
+
+# install phyloseq package
+BiocManager::install("phyloseq")
+no
+
+# activate package
+require(phyloseq)
+
 ## OPTIONAL: export ASV table and taxonomy table to text files
 # to import into QIIME or other program
+install.packages("readr")
+write.table(tax, "taxa.csv", sep=",")
 
 
 ### ---- phyloseq ----
