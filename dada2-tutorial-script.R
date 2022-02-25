@@ -50,8 +50,8 @@ PATTERNR = "_2.fq.gz"
 
 # get forward and reverse files
 ## for this demo, subset to the first 2 forward and 2 reverse files
-fwdFiles <- list.files(PATH, pattern = PATTERNF, full.names = TRUE)[1:2]
-revFiles <- list.files(PATH, pattern = PATTERNR, full.names = TRUE)[1:2]
+fwdFiles <- list.files(PATH, pattern = PATTERNF, full.names = TRUE)[1:10]
+revFiles <- list.files(PATH, pattern = PATTERNR, full.names = TRUE)[1:10]
 
 # check to make sure that the lengths of both files are the same
 if(length(fwdFiles) != length(revFiles)) {
@@ -142,9 +142,11 @@ if(length(fwdNames) != length(revNames)) {
 
 # perform error learning
 errF <- learnErrors(forward, 
-                    multithread = TRUE)
+                    multithread = TRUE
+                    verbose = TRUE)
 errR <- learnErrors(reverse, 
-                    multithread = TRUE)
+                    multithread = TRUE,
+                    verbose = TRUE)
 
 # visualize error plots - with binned quality score, it will look bad: we want the black lines
 # to match up with the red lines
@@ -193,13 +195,14 @@ tax <- assignTaxonomy(seqs = seqtab.nochim,
                       verbose = TRUE)
 
 # OPTIONAL: add species to table using Silva database
-taxa_species <- addSpecies(tax, "~/Downloads/silva_species_assignment_v138.1.fa")
+taxa_species <- addSpecies(tax, "~/Downloads/silva_species_assignment_v138.1.fa",
+                           verbose = TRUE)
 
 # export the dataframe to csv file 
-write.csv(tax, "PATH\\taxa.csv", row.names = FALSE)
+write.csv(tax, "PATH\\taxa10.csv", row.names = FALSE)
 
 # export the datafram with species to csv file
-write.csv(taxa_species, "PATH\\taxa_species.csv", row.names = FALSE)
+write.csv(taxa_species, "PATH\\taxa_species10.csv", row.names = FALSE)
 
 ## This is the end of the dada2 algorithm
 
@@ -211,11 +214,6 @@ no
 
 # activate package
 require(phyloseq)
-
-## OPTIONAL: export ASV table and taxonomy table to text files
-# to import into QIIME or other program
-write.table(tax, "taxa.csv", sep=",")
-
 
 ### ---- phyloseq ----
 
