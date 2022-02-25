@@ -80,17 +80,24 @@ filtReverse <- file.path("~/Desktop/16s-workshop/filtered", paste0(revNames, "_R
 ## Dada2 can plot Phred qualities but FastQC is much better
 plotQualityProfile(fwdFiles[1])
 
+# white blocks in the plot are because it is binned quality scores...additional steps are needed.
+
 # filter and trim
 cleaned <- filterAndTrim(
   # set forward and reverse paths
   fwd = fwdFiles, rev = revFiles,
   # set paths for the filtered files that will be created
   filt = filtForward, filt.rev = filtReverse,
-  # add any necessary filtering parameters
+  # add any necessary filtering parameters, dada2 does not allow ambiguous bases
   maxN = 0,
   
+  # set maxEE to 2 and minimum length to 100bp
+  maxEE = 2,
+  minLen = 100,
+  
   # MAC ONLY: multithread ability
-  multithread = TRUE
+  multithread = TRUE, 
+  verbose = TRUE
 )
 
 # path to filtered and cleaned reads
@@ -100,9 +107,10 @@ CLEANEDPATH = "~/Desktop/16s-workshop/filtered/"
 # in reality: do this step in FastQC as well
 plotQualityProfile(CLEANEDPATH[1])
 
+# good spot to do another fastqc check in terminal on the trimmed data
 
 
-## ---- dada2 algorithm----
+## -----------------dada2 algorithm------------------
 
 ### NOTE: some patterns are re-done because this script can also be run
 # after filtering with Trimmomatic or another program like QIIME
@@ -116,9 +124,12 @@ FILTEREDR = "_R_filt.fastq.gz"
 forward <- sort(list.files(CLEANEDPATH, pattern = FILTEREDF, full.names = TRUE))
 reverse <- sort(list.files(CLEANEDPATH, pattern = FILTEREDR, full.names = TRUE))
 
-# check to make sure that the lengths of both files are the same and that they match
+# check to make sure that the lengths of both files are the same and that they match names
 fwdNames <- sapply(strsplit(basename(forward), FILTEREDF), `[`, 1)
 revNames <- sapply(strsplit(basename(reverse), FILTEREDR), `[`, 1)
+
+# error catch
+
 if(length(fwdNames) != length(revNames)) {
   stop("The number of forward and reverse files do not match.")
 } else {
@@ -135,7 +146,14 @@ errF <- learnErrors(forward,
 errR <- learnErrors(reverse, 
                     multithread = TRUE)
 
-# perform denoising on forward and reverse reads
+# visualize error plots - with binned quality score, it will look bad: we want the black lines
+# to match up with the red lines
+plotErrors(errF, nominalQ = TRUE)
+
+# visualize reverse plots
+plotErrors(errR, nominalQ = TRUE)
+
+# perform denoising on forward and reverse reads (sample interference)
 dadaForward <- dada(derep = forward, 
                     err = errF, 
                     multithread = TRUE)
@@ -153,17 +171,35 @@ mergers <- mergePairs(dadaF = dadaForward,
 # construct sequence table of ASVs
 seqtab <- makeSequenceTable(samples = mergers)
 
+# view the dimensions of the table
+dim(seqtab)
+
+# inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab)))
+
 # remove chimeras
 seqtab.nochim <- removeBimeraDenovo(unqs = seqtab, 
                                     method = "consensus",
                                     multithread = TRUE,
                                     verbose = TRUE)
 
+# view dimensions of seqence table with no chimeras
+dim(seqtab.nochim)
+
 # assign taxonomy using the Silva database
 tax <- assignTaxonomy(seqs = seqtab.nochim, 
                       refFasta = DB, 
                       multithread = TRUE,
                       verbose = TRUE)
+
+# OPTIONAL: add species to table using Silva database
+taxa_species <- addSpecies(tax, "~/Downloads/silva_species_assignment_v138.1.fa")
+
+# export the dataframe to csv file 
+write.csv(tax, "PATH\\taxa.csv", row.names = FALSE)
+
+# export the datafram with species to csv file
+write.csv(taxa_species, "PATH\\taxa_species.csv", row.names = FALSE)
 
 ## This is the end of the dada2 algorithm
 
@@ -178,7 +214,6 @@ require(phyloseq)
 
 ## OPTIONAL: export ASV table and taxonomy table to text files
 # to import into QIIME or other program
-install.packages("readr")
 write.table(tax, "taxa.csv", sep=",")
 
 
