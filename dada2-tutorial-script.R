@@ -19,6 +19,8 @@ no
 # load the package
 require(dada2)
 
+# load our environment
+load("Capsicum-Environment.RData")
 
 
 # path to directory that contains fastq files
@@ -142,7 +144,7 @@ if(length(fwdNames) != length(revNames)) {
 
 # perform error learning
 errF <- learnErrors(forward, 
-                    multithread = TRUE
+                    multithread = TRUE,
                     verbose = TRUE)
 errR <- learnErrors(reverse, 
                     multithread = TRUE,
@@ -203,6 +205,10 @@ write.csv(tax, "PATH\\taxa10.csv", row.names = FALSE)
 
 # export the datafram with species to csv file
 write.csv(taxa_species, "PATH\\taxa_species10.csv", row.names = FALSE)
+
+# end of dada2 - export objects
+save(seqtab.nochim, file = "asv-table.RData")
+save(tax, file = "taxonomy-table.RData")
 
 ## This is the end of the dada2 algorithm
 
