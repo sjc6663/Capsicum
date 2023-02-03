@@ -1,3 +1,3 @@
 # Capsicum
 
-type something in here for practice
+16S rRNA Analysis of Microbiome
