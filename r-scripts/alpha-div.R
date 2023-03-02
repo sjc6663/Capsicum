@@ -40,7 +40,7 @@ adivHf <- data.frame(
   "Treatment" = phyloseq::sample_data(H_fecal_counts)$Treatment 
 )
 head(adivHf)
-write.csv(adivHf,"tables/tables/holstein-fecal.csv", row.names = FALSE)
+write.csv(adivHf,"tables/holstein-fecal.csv", row.names = FALSE)
 
 
 #adivHr <- data.frame(
@@ -49,7 +49,7 @@ write.csv(adivHf,"tables/tables/holstein-fecal.csv", row.names = FALSE)
 #  "Treatment" = phyloseq::sample_data(H_rumen_counts)$Treatment 
 #)
 #head(adivHr)
-#write.csv(adivHr,"tables/tables/holstein-rumen.csv", row.names = FALSE)
+#write.csv(adivHr,"tables/holstein-rumen.csv", row.names = FALSE)
 
 adivAf <- data.frame(
   # "Observed" = phyloseq::estimate_richness(A_fecal_counts, measures = "Observed"),
@@ -57,7 +57,7 @@ adivAf <- data.frame(
   "Treatment" = phyloseq::sample_data(A_fecal_counts)$Treatment 
 )
 head(adivAf)
-write.csv(adivAf,"tables/tables/angus-fecal.csv", row.names = FALSE)
+write.csv(adivAf,"tables/angus-fecal.csv", row.names = FALSE)
 
 #adivAr <- data.frame(
 # "Observed" = phyloseq::estimate_richness(A_rumen_counts, measures = "Observed"),
@@ -65,7 +65,7 @@ write.csv(adivAf,"tables/tables/angus-fecal.csv", row.names = FALSE)
 #  "Treatment" = phyloseq::sample_data(A_rumen_counts)$Treatment 
 #)
 #head(adivAr)
-#write.csv(adivAr,"tables/tables/angus-rumen.csv", row.names = FALSE)
+#write.csv(adivAr,"tables/angus-rumen.csv", row.names = FALSE)
 
 ## ---- Shannon ANOVA with Holstein and Angus ----
 testHf <- aov(Shannon ~ Treatment, data = adivHf)
@@ -121,4 +121,11 @@ ggsave(plot = B, filename = "plots/alpha-diversity-angus-fecal.pdf", dpi = 600)
 
 #(A|B)/(C|D)
 A|B
-ggsave(filename = "ppllots/shannon-diversity-all-fecal.pdf", dpi = 600)
+ggsave(filename = "plots/shannon-diversity-all-fecal.pdf", dpi = 600)
+
+## ---- Rumen Time Series Analysis ----
+# can use repeated measures design for this 
+
+
+
+
