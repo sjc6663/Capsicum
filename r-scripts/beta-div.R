@@ -9,10 +9,10 @@ library(vegan)
 library(patchwork)
 
 # load phyloseq objects
-load("beta-diversity/phyloseq-fecal-samples-angus-relabund.RData")
-load("beta-diversity/phyloseq-fecal-samples-holstein-relabund.RData")
-load("beta-diversity/phyloseq-rumen-samples-angus-relabund.RData")
-load("beta-diversity/phyloseq-rumen-samples-holstein-relabund.RData")
+load("ps-obj/phyloseq-fecal-samples-angus-relabund.RData")
+load("ps-obj/phyloseq-fecal-samples-holstein-relabund.RData")
+load("ps-obj/phyloseq-rumen-samples-angus-relabund.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-relabund.RData")
 
 # check if we have NAs
 anyNA(tax_table(H_fecal_rel)[,"Phylum"])
@@ -82,7 +82,7 @@ A <- H_fecal_rel %>%
   theme(legend.position = "none") +
   labs(caption = "")
 
-ggsave(filename = "Plots/PCA-microViz-holstein-fecal.pdf", dpi = 600)
+ggsave(filename = "plots/PCA-microViz-holstein-fecal.pdf", dpi = 600)
 
 ##  PCA plot - fecal - angus
 B <- A_fecal_rel %>% 
@@ -96,7 +96,7 @@ B <- A_fecal_rel %>%
   ggtitle("B") + 
   labs(caption = "")
 
-ggsave(filename = "Plots/PCA-microViz-angus-fecal.pdf", dpi = 600)
+ggsave(filename = "plots/PCA-microViz-angus-fecal.pdf", dpi = 600)
 
 ##  PCA plot - fecal - treatment
 C <- H_rumen_rel %>% 
@@ -111,7 +111,7 @@ C <- H_rumen_rel %>%
   theme(legend.position = "none") +
   labs(caption = "")
 
-ggsave(filename = "Plots/PCA-microViz-rumen-holstein.pdf", dpi = 600)
+ggsave(filename = "plots/PCA-microViz-rumen-holstein.pdf", dpi = 600)
 
 ##  PCA plot - fecal - treatment
 D <- A_rumen_rel %>% 
@@ -126,8 +126,8 @@ D <- A_rumen_rel %>%
   labs(caption = "")
 
 D
-ggsave(filename = "Plots/PCA-microViz-angus-rumen.pdf", dpi = 600)
+ggsave(filename = "plots/PCA-microViz-angus-rumen.pdf", dpi = 600)
 
 (A|B)/(C|D)
 
-ggsave(filename = "Plots/PCA-all-samples.pdf", dpi = 600)
+ggsave(filename = "plots/PCA-all-samples.pdf", dpi = 600)

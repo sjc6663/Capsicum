@@ -6,8 +6,8 @@ library(phyloseq)
 library(microViz)
 
 ## ---- load relative abundance phyloseqs ----
-load("beta-diversity/phyloseq-fecal-samples-only-relabund.RData")
-load("beta-diversity/phyloseq-rumen-samples-only-relabund.RData")
+load("ps-obj/phyloseq-fecal-samples-only-relabund.RData")
+load("ps-obj/phyloseq-rumen-samples-only-relabund.RData")
 
 ## ---- Tax Fix ----
 ### From here on out you have to run doubles, so one for fecal and one for rumen ###

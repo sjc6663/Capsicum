@@ -15,7 +15,7 @@ require(decontam)
 require(ggpubr)
 
 # get data - pull in raw phyloseq
-load("data-objects-redo/phyloseq-raw.RData")
+load("ps-obj/phyloseq-raw.RData")
 
 ## ---- basic info ----
 
@@ -101,7 +101,7 @@ factor(sample_data(pssave)$Steer.ID)
 #this leaves 1691 taxa
 
 # write
-saveRDS(pssave, "data-objects-redo/ps-decontam-filtered.rds")
+saveRDS(pssave, "ps-obj/ps-decontam-filtered.rds")
 
 ## ---- negative controls ----
 
@@ -168,10 +168,10 @@ p
 
 
 # save
-ggsave(filename = "neg-control-barplot.png", plot = p, dpi = 600)
+ggsave(filename = "plots/neg-control-barplot.png", plot = p, dpi = 600)
 
 # save
-saveRDS(negf, file = "data-objects-redo/ps-negcontrols-filtered.rds")
+saveRDS(negf, file = "ps-obj/ps-negcontrols-filtered.rds")
 
 
 ## ----- positive control -----
@@ -221,7 +221,7 @@ p <- pspos %>%
   ) 
 
 # save
-ggsave(filename = "pos-control-barplot.png", plot = last_plot(), dpi = 600)
+ggsave(filename = "plots/pos-control-barplot.png", plot = last_plot(), dpi = 600)
 
 ## ---- build positive Zymo control ----
 
@@ -279,7 +279,7 @@ ggarrange(p, z, common.legend = TRUE, legend = "right")
 
 
 
-ggsave(filename = "pos-with-zymo.png", dpi = 600)
+ggsave(filename = "plots/pos-with-zymo.png", dpi = 600)
 
 ## ---- find taxa in pos not in zymo ----
 get_taxa_unique(pspos, "Phylum")
@@ -317,7 +317,7 @@ p2 <- pstruepos %>%
 ggarrange(p2, z, common.legend = TRUE, legend = "right")
 
 #save 
-ggsave(filename = "posfilt-with-zymo.png", dpi = 600)
+ggsave(filename = "plots/posfilt-with-zymo.png", dpi = 600)
 
 
 ## ---- get phyloseq of counts ----
@@ -340,8 +340,8 @@ factor(sample_data(psrelabund2)$Steer.ID)
 sample_data(pscount2)
 
 # save
-saveRDS(pscount2, file = "ps-decontam-filtered-counts.rds") # use this file for alpha diversity
-saveRDS(psrelabund2, file = "ps-decontam-relabund.rds") # use this file for beta diversity and clr transform
+saveRDS(pscount2, file = "ps-obj/ps-decontam-filtered-counts.rds") # use this file for alpha diversity
+saveRDS(psrelabund2, file = "ps-obj/ps-decontam-relabund.rds") # use this file for beta diversity and clr transform
 
 ## ---- Relative abundance barplot ----
 
@@ -358,7 +358,7 @@ pscount2 %>%
   ) +
   facet_wrap(~ Sample.Type)
 
-save.image(file = "data-objects-redo/working_decontam.RData")
+save.image(file = "ps-obj/working_decontam.RData")
 
 
 pssave

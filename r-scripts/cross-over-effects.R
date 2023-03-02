@@ -10,8 +10,8 @@ library(tidyverse)
 library(vegan)
 library(dplyr)
 
-load("alpha-diversity/phyloseq-fecal-samples-only-counts.RData")
-load("alpha-diversity/phyloseq-rumen-samples-only-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-only-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-only-counts.RData")
 
 # check if we have NAs
 anyNA(tax_table(fecal_counts)[,"Phylum"])
@@ -141,8 +141,8 @@ mod_dmr
 
 ## ---- setup for Holstein Counts ----
 # load in Holstein Fecal and Rumen Counts
-load("alpha-diversity/phyloseq-fecal-samples-holstein-counts.RData")
-load("alpha-diversity/phyloseq-rumen-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-counts.RData")
 
 # load in effect coding table
 dat <- readxl::read_xlsx("metadata/Extraction_IDs.xlsx",
@@ -210,8 +210,8 @@ summary(modHr) # no effects
 
 ## ---- setup for Angus Counts ----
 # load in Angus Fecal and Rumen Counts
-load("alpha-diversity/phyloseq-fecal-samples-angus-counts.RData")
-load("alpha-diversity/phyloseq-rumen-samples-angus-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-angus-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-angus-counts.RData")
 
 # load in effect coding table
 dat <- readxl::read_xlsx("metadata/Extraction_IDs.xlsx",

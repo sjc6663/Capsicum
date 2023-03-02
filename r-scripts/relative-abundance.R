@@ -36,8 +36,8 @@ rumen_rel
 sample_data(rumen_rel)
 
 # save these separate phyloseq objects
-save(fecal_rel, file = "beta-diversity/phyloseq-fecal-samples-only-relabund.RData")
-save(rumen_rel, file = "beta-diversity/phyloseq-rumen-samples-only-relabund.RData")
+save(fecal_rel, file = "ps-obj/phyloseq-fecal-samples-only-relabund.RData")
+save(rumen_rel, file = "ps-obj/phyloseq-rumen-samples-only-relabund.RData")
 
 ## ---- Tax Fix ----
 ### From here on out you have to run doubles, so one for fecal and one for rumen ###

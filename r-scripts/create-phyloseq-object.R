@@ -101,9 +101,9 @@ ps
 psraw <- ps
 
 # save as RImage
-save(psraw, file = "data-objects-redo/phyloseq-raw.RData")
+save(psraw, file = "ps-obj/phyloseq-raw.RData")
 
-load("data-objects-redo/phyloseq-raw.RData")
+load("ps-obj/phyloseq-raw.RData")
 
 psraw
 

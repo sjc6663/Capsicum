@@ -2,8 +2,8 @@
 # 11-14-22 SAB
 
 ## ---- load phyloseq objects ----
-load("alpha-diversity/phyloseq-fecal-samples-only-counts.RData")
-load("alpha-diversity/phyloseq-rumen-samples-only-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-only-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-only-counts.RData")
 
 # check if we have NAs
 anyNA(tax_table(fecal_counts)[,"Phylum"])

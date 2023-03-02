@@ -12,10 +12,10 @@ library(edgeR)
 library(DESeq2)
 library(knitr)
 
-load("alpha-diversity/phyloseq-fecal-samples-angus-counts.RData")
-load("alpha-diversity/phyloseq-fecal-samples-holstein-counts.RData")
-load("alpha-diversity/phyloseq-rumen-samples-angus-counts.RData")
-load("alpha-diversity/phyloseq-rumen-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-angus-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-angus-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-counts.RData")
 
 # check if we have NAs
 anyNA(tax_table(A_fecal_counts)[,"Phylum"])
@@ -115,7 +115,7 @@ resrH5 = results(dsrH5, cooksCutoff = FALSE)
 alpha = 0.05
 sigtabrH5 = resrH5[which(resrH5$padj < alpha), ]
 sigtabrH5 = cbind(as(sigtabrH5, "data.frame"), as(tax_table(H_rumen_counts5)[rownames(sigtabrH5), ], "matrix"))
-write.csv(sigtabrH5, file = "differential-rel-abund/Rumen/H5.csv")
+write.csv(sigtabrH5, file = "tables/rumen-H5.csv")
 
 ## plot
 # Phylum order
@@ -138,7 +138,7 @@ Hr5_A <- ggplot(data = sigtabrH5,
   theme_classic() +
   ggtitle("A")
 
-ggsave("differential-rel-abund/Rumen/holstein-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/rumen-holstein-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 rH5 <- ggdotchart(sigtabrH5, y = "log2FoldChange", x = "Genus",
                   color = "Phylum", shape = "Phylum",
@@ -160,7 +160,7 @@ rH5 <- ggdotchart(sigtabrH5, y = "log2FoldChange", x = "Genus",
 
 rH5
 
-ggsave("differential-rel-abund/Rumen/holstein-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/rumen-holstein-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 
 # use patchwork to plot multiple graphs onto one graph (if that makes sense)
@@ -218,7 +218,7 @@ alpha = 0.05
 sigtabrA5 = resrA5[which(resrA5$padj < alpha), ]
 sigtabrA5
 sigtabrA5 = cbind(as(sigtabrA5, "data.frame"), as(tax_table(A_rumen_counts5)[rownames(sigtabrA5), ], "matrix"))
-write.csv(sigtabrA5, file = "differential-rel-abund/Rumen/A5.csv")
+write.csv(sigtabrA5, file = "tables/rumen-A5.csv")
 
 ## plot
 # Phylum order
@@ -237,7 +237,7 @@ rA5 <- ggplot(sigtabrA5, aes(x=log2FoldChange, y=Genus, color=Phylum, shape=Phyl
 
 rA5
 
-ggsave("differential-rel-abund/Rumen/angus-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/rumen-angus-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 rA5 <- ggdotchart(sigtabrA5, y = "log2FoldChange", x = "Genus",
                   color = "Phylum", shape = "Phylum",
@@ -273,7 +273,7 @@ alpha = 0.05
 sigtabrA10 = resrA10[which(resrA10$padj < alpha), ]
 sigtabrA10
 sigtabrA10 = cbind(as(sigtabrA10, "data.frame"), as(tax_table(A_rumen_counts10)[rownames(sigtabrA10), ], "matrix"))
-write.csv(sigtabrA10, file = "differential-rel-abund/Rumen/A10.csv")
+write.csv(sigtabrA10, file = "tables/rumen-A10.csv")
 
 ## plot
 # Phylum order
@@ -290,7 +290,7 @@ rA10 <- ggplot(sigtabrA10, aes(x=log2FoldChange, y=Genus, color=Phylum, shape=Ph
   ggtitle("B") +
   theme_classic()
 
-ggsave("differential-rel-abund/Rumen/angus-rpc10-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/rumen-angus-rpc10-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 rA10 <- ggdotchart(sigtabrA10, y = "log2FoldChange", x = "Genus",
                    color = "Phylum", shape = "Phylum",
@@ -326,7 +326,7 @@ alpha = 0.05
 sigtabrA15 = resrA15[which(resrA15$padj < alpha), ]
 sigtabrA15
 sigtabrA15 = cbind(as(sigtabrA15, "data.frame"), as(tax_table(A_rumen_counts15)[rownames(sigtabrA15), ], "matrix"))
-write.csv(sigtabrA15, file = "differential-rel-abund/Rumen/A15.csv")
+write.csv(sigtabrA15, file = "tables/rumen-A15.csv")
 
 ## plot
 # Phylum order
@@ -347,7 +347,7 @@ ggdotchart(sigtabrA15, aes(x=log2FoldChange, y=Genus, color = Phylum, shape=Phyl
 
 rA15
 
-ggsave("differential-rel-abund/Rumen/angus-rpc15-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/rumen-angus-rpc15-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 rA15 <- ggdotchart(sigtabrA15, y = "log2FoldChange", x = "Genus",
                    color = "Phylum", shape = "Phylum",
@@ -371,7 +371,7 @@ rA15 <- ggdotchart(sigtabrA15, y = "log2FoldChange", x = "Genus",
 library(patchwork)
 (rA5 / rA10) | rA15
 
-ggsave("differential-rel-abund/Rumen/angus-all.pdf", dpi = 600, width = 20, height = 16)
+ggsave("plots/rumen-angus-all.pdf", dpi = 600, width = 20, height = 16)
 
 ## ---- FECAL, Holstein RPC5 ----
 # add pseudo count of 1 
@@ -389,7 +389,7 @@ alpha = 0.05
 sigtabfH5 = resfH5[which(resfH5$padj < alpha), ]
 sigtabfH5
 sigtabfH5 = cbind(as(sigtabfH5, "data.frame"), as(tax_table(H_fecal_counts5)[rownames(sigtabfH5), ], "matrix"))
-write.csv(sigtabfH5, file = "differential-rel-abund/Fecal/H5.csv")
+write.csv(sigtabfH5, file = "tables/fecal-H5.csv")
 
 ## plot
 # Phylum order
@@ -406,7 +406,7 @@ fH5 <- ggplot(sigtabfH5, aes(x=log2FoldChange, y=Genus, color=Phylum, shape=Phyl
   ggtitle("A") + 
   theme_classic()
 
-ggsave("differential-rel-abund/Fecal/holstein-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/fecal-holstein-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 fH5 <- ggdotchart(sigtabfH5, y = "log2FoldChange", x = "Genus",
                   color = "Phylum", shape = "Phylum",
@@ -442,7 +442,7 @@ alpha = 0.05
 sigtabfH10 = resfH10[which(resfH10$padj < alpha), ]
 sigtabfH10
 sigtabfH10 = cbind(as(sigtabfH10, "data.frame"), as(tax_table(H_fecal_counts10)[rownames(sigtabfH10), ], "matrix"))
-write.csv(sigtabfH10, file = "differential-rel-abund/Fecal/H10.csv")
+write.csv(sigtabfH10, file = "tables/fecal-H10.csv")
 
 ## plot
 # Phylum order
@@ -459,7 +459,7 @@ fH10 <- ggplot(sigtabfH10, aes(x=log2FoldChange, y=Genus, color=Phylum, shape=Ph
   ggtitle("B") +
   theme_classic()
 
-ggsave("differential-rel-abund/Fecal/holstein-rpc10-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/fecal-holstein-rpc10-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 fH10 <- ggdotchart(sigtabfH10, y = "log2FoldChange", x = "Genus",
                    color = "Phylum", shape = "Phylum",
@@ -495,7 +495,7 @@ alpha = 0.05
 sigtabfH15 = resfH15[which(resfH15$padj < alpha), ]
 sigtabfH15
 sigtabfH15 = cbind(as(sigtabfH15, "data.frame"), as(tax_table(H_fecal_counts15)[rownames(sigtabfH15), ], "matrix"))
-write.csv(sigtabfH15, file = "differential-rel-abund/Fecal/H15.csv")
+write.csv(sigtabfH15, file = "tables/fecal-H15.csv")
 
 ## plot
 # Phylum order
@@ -512,7 +512,7 @@ fH15 <- ggplot(sigtabfH15, aes(x=log2FoldChange, y=Genus, color=Phylum, shape=Ph
   ggtitle("C") +
   theme_classic()
 fH15
-ggsave("differential-rel-abund/Fecal/holstein-rpc15-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/fecal-holstein-rpc15-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 fH15 <- ggdotchart(sigtabfH15, y = "log2FoldChange", x = "Genus",
                    color = "Phylum", shape = "Phylum",
@@ -533,7 +533,7 @@ fH15 <- ggdotchart(sigtabfH15, y = "log2FoldChange", x = "Genus",
   ggtitle("C")
 
 (fH5 / fH15) | fH10
-ggsave("differential-rel-abund/Fecal/holstein-all.pdf", dpi = 600, width = 16, height = 12)
+ggsave("plots/fecal-holstein-all.pdf", dpi = 600, width = 16, height = 12)
 
 ## ---- FECAL, Angus RPC5 ----
 # add pseudo count of 1 
@@ -551,7 +551,7 @@ alpha = 0.05
 sigtabfA5 = resfA5[which(resfA5$padj < alpha), ]
 sigtabfA5
 sigtabfA5 = cbind(as(sigtabfA5, "data.frame"), as(tax_table(A_fecal_counts5)[rownames(sigtabfA5), ], "matrix"))
-write.csv(sigtabfA5, file = "differential-rel-abund/Fecal/A5.csv")
+write.csv(sigtabfA5, file = "tables/fecal-A5.csv")
 
 ## plot
 # Phylum order
@@ -568,7 +568,7 @@ fA5 <- ggplot(sigtabfA5, aes(x=log2FoldChange, y=Genus, color=Phylum, shape=Phyl
   ggtitle("A") +
   theme_classic()
 
-ggsave("differential-rel-abund/Fecal/angus-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/fecal-angus-rpc5-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 fA5 <- ggdotchart(sigtabfA5, y = "log2FoldChange", x = "Genus",
                   color = "Phylum", shape = "Phylum",
@@ -604,7 +604,7 @@ alpha = 0.05
 sigtabfA10 = resfA10[which(resfA10$padj < alpha), ]
 sigtabfA10
 sigtabfA10 = cbind(as(sigtabfA10, "data.frame"), as(tax_table(A_fecal_counts10)[rownames(sigtabfA10), ], "matrix"))
-write.csv(sigtabfA10, file = "differential-rel-abund/Fecal/A10.csv")
+write.csv(sigtabfA10, file = "tables/fecal-A10.csv")
 
 ## plot
 # Phylum order
@@ -621,7 +621,7 @@ fA10 <- ggplot(sigtabfA10, aes(x=log2FoldChange, y=Genus, color=Phylum, shape=Ph
   ggtitle("B") +
   theme_classic()
 
-ggsave("differential-rel-abund/Fecal/angus-rpc10-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/fecal-angus-rpc10-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 fA10 <- ggdotchart(sigtabfA10, y = "log2FoldChange", x = "Genus",
                    color = "Phylum", shape = "Phylum",
@@ -657,7 +657,7 @@ alpha = 0.05
 sigtabfA15 = resfA15[which(resfA15$padj < alpha), ]
 sigtabfA15
 sigtabfA15 = cbind(as(sigtabfA15, "data.frame"), as(tax_table(A_fecal_counts15)[rownames(sigtabfA15), ], "matrix"))
-write.csv(sigtabfA15, file = "differential-rel-abund/Fecal/A15.csv")
+write.csv(sigtabfA15, file = "tables/fecal-A15.csv")
 
 ## plot
 # Phylum order
@@ -674,7 +674,7 @@ fA15 <- ggplot(sigtabfA15, aes(x=log2FoldChange, y=Genus, color=Phylum, shape=Ph
   ggtitle("C") + 
   theme_classic()
 
-ggsave("differential-rel-abund/Fecal/angus-rpc15-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
+ggsave("plots/fecal-angus-rpc15-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, height = 7)
 
 fA15 <- ggdotchart(sigtabfA15, y = "log2FoldChange", x = "Genus",
                    color = "Phylum", shape = "Phylum",
@@ -695,4 +695,4 @@ fA15 <- ggdotchart(sigtabfA15, y = "log2FoldChange", x = "Genus",
   ggtitle("C")
 
 fA5 | (fA10 / fA15)
-ggsave("differential-rel-abund/Fecal/angus-all.pdf", dpi = 600, width = 17, height = 14)
+ggsave("plotes/fecal-angus-all.pdf", dpi = 600, width = 17, height = 14)

@@ -10,8 +10,8 @@ library(ggpubr)
 library(patchwork)
 
 ## ---- load phyloseq objects ----
-load("alpha-diversity/phyloseq-fecal-samples-angus-counts.RData")
-load("alpha-diversity/phyloseq-fecal-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-angus-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-holstein-counts.RData")
 #load("alpha-diversity/phyloseq-rumen-samples-angus-counts.RData")
 #load("alpha-diversity/phyloseq-rumen-samples-holstein-counts.RData")
 
@@ -40,7 +40,7 @@ adivHf <- data.frame(
   "Treatment" = phyloseq::sample_data(H_fecal_counts)$Treatment 
 )
 head(adivHf)
-write.csv(adivHf,"alpha-diversity/tables/holstein-fecal.csv", row.names = FALSE)
+write.csv(adivHf,"tables/tables/holstein-fecal.csv", row.names = FALSE)
 
 
 #adivHr <- data.frame(
@@ -49,7 +49,7 @@ write.csv(adivHf,"alpha-diversity/tables/holstein-fecal.csv", row.names = FALSE)
 #  "Treatment" = phyloseq::sample_data(H_rumen_counts)$Treatment 
 #)
 #head(adivHr)
-#write.csv(adivHr,"alpha-diversity/tables/holstein-rumen.csv", row.names = FALSE)
+#write.csv(adivHr,"tables/tables/holstein-rumen.csv", row.names = FALSE)
 
 adivAf <- data.frame(
   # "Observed" = phyloseq::estimate_richness(A_fecal_counts, measures = "Observed"),
@@ -57,7 +57,7 @@ adivAf <- data.frame(
   "Treatment" = phyloseq::sample_data(A_fecal_counts)$Treatment 
 )
 head(adivAf)
-write.csv(adivAf,"alpha-diversity/tables/angus-fecal.csv", row.names = FALSE)
+write.csv(adivAf,"tables/tables/angus-fecal.csv", row.names = FALSE)
 
 #adivAr <- data.frame(
 # "Observed" = phyloseq::estimate_richness(A_rumen_counts, measures = "Observed"),
@@ -65,7 +65,7 @@ write.csv(adivAf,"alpha-diversity/tables/angus-fecal.csv", row.names = FALSE)
 #  "Treatment" = phyloseq::sample_data(A_rumen_counts)$Treatment 
 #)
 #head(adivAr)
-#write.csv(adivAr,"alpha-diversity/tables/angus-rumen.csv", row.names = FALSE)
+#write.csv(adivAr,"tables/tables/angus-rumen.csv", row.names = FALSE)
 
 ## ---- Shannon ANOVA with Holstein and Angus ----
 testHf <- aov(Shannon ~ Treatment, data = adivHf)
@@ -89,7 +89,7 @@ A <- plot_richness(H_fecal_counts, x="Treatment", measures=c("Shannon"), title =
   theme_classic() +
   theme(legend.position = "none")
 A
-ggsave(plot = A, filename = "Plots/alpha-diversity-holstein-fecal.pdf", dpi = 600)
+ggsave(plot = A, filename = "plots/alpha-diversity-holstein-fecal.pdf", dpi = 600)
 
 #sample_data(H_rumen_counts)$"Treatment" <- factor(sample_data(H_rumen_counts)$"Treatment", 
 #                                                 levels = c("Control", "RPC5", "RPC10", "RPC15"))
@@ -98,7 +98,7 @@ ggsave(plot = A, filename = "Plots/alpha-diversity-holstein-fecal.pdf", dpi = 60
 # scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) + 
 # theme_classic() +
 #  theme(legend.position = "none")
-#ggsave(plot = C, filename = "Plots/alpha-diversity-holstein-rumen.pdf", dpi = 600)
+#ggsave(plot = C, filename = "plots/alpha-diversity-holstein-rumen.pdf", dpi = 600)
 
 sample_data(A_fecal_counts)$"Treatment" <- factor(sample_data(A_fecal_counts)$"Treatment", 
                                                   levels = c("Control", "RPC5", "RPC10", "RPC15"))
@@ -108,7 +108,7 @@ B <- plot_richness(A_fecal_counts, x="Treatment", measures=c("Shannon"), title =
   theme_classic() +
   theme(legend.position = "none")
 B
-ggsave(plot = B, filename = "Plots/alpha-diversity-angus-fecal.pdf", dpi = 600)
+ggsave(plot = B, filename = "plots/alpha-diversity-angus-fecal.pdf", dpi = 600)
 
 #sample_data(A_rumen_counts)$"Treatment" <- factor(sample_data(A_rumen_counts)$"Treatment", 
 #                                                  levels = c("Control", "RPC5", "RPC10", "RPC15"))
@@ -117,8 +117,8 @@ ggsave(plot = B, filename = "Plots/alpha-diversity-angus-fecal.pdf", dpi = 600)
 #  scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) + 
 #  theme_classic() +
 #  theme(legend.position = "none")
-#ggsave(plot = D, filename = "Plots/alpha-diversity-angus-rumen.pdf", dpi = 600)
+#ggsave(plot = D, filename = "plots/alpha-diversity-angus-rumen.pdf", dpi = 600)
 
 #(A|B)/(C|D)
 A|B
-ggsave(filename = "Plots/shannon-diversity-all-fecal.pdf", dpi = 600)
+ggsave(filename = "ppllots/shannon-diversity-all-fecal.pdf", dpi = 600)
