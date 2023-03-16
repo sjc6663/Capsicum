@@ -42,6 +42,8 @@ save(rumen_rel, file = "ps-obj/phyloseq-rumen-samples-only-relabund.RData")
 ## ---- Tax Fix ----
 ### From here on out you have to run doubles, so one for fecal and one for rumen ###
 
+load("ps-obj/phyloseq-fecal-samples-only-relabund.RData")
+load("ps-obj/phyloseq-rumen-samples-only-relabund.RData")
 
 # check if we have NAs
 anyNA(tax_table(fecal_rel)[,"Phylum"])
@@ -63,10 +65,15 @@ fp_rel <- comp_barplot(fecal_rel,
 fp_rel
 
 # Rumen
-rp_rel <- comp_barplot(rumen_rel,
+
+sample_data(rumen_rel)$"Hour" <- factor(sample_data(rumen_rel)$"Hour", 
+                                          levels = c("H0", "H2", "H6", "H12", "H18"))
+
+rp_rel 
+comp_barplot(rumen_rel,
                        tax_level = "Phylum",
                        group_by = "Treatment",
-                       facet_by = "Breed")
+                       facet_by = "Breed",)
 
 rp_rel
 
