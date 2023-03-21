@@ -71,9 +71,11 @@ dsh2 <- DESeq(ddsh2, test = "Wald", fitType = "parametric")
 
 # get results
 resh2 = results(dsh2, cooksCutoff = FALSE)
-alpha = 0.05
+# we are going to set this to be more stringent because we got A LOT of taxa at 0.05.
+alpha = 0.01
 sigtabh2 = resh2[which(resh2$padj < alpha), ]
 sigtabh2 = cbind(as(sigtabh2, "data.frame"), as(tax_table(H2)[rownames(sigtabh2), ], "matrix"))
+sigtabh2
 write.csv(sigtabh2, file = "tables/rumen-H-0v2.csv")
 
 ## plot
@@ -87,7 +89,8 @@ x = sort(x, TRUE)
 sigtabh2$Genus = factor(as.character(sigtabh2$Genus), levels=names(x))
 sigtabh2
 
-ph2 <- ggdotchart(sigtabh2, y = "log2FoldChange", x = "Genus",
+# ph2 <- 
+  ggdotchart(sigtabh2, y = "log2FoldChange", x = "Genus",
                  color = "Phylum",
                  sorting = "descending",
                  add = "segments", add.params = list(size = 2, alpha = 0.5, linetype = "dashed"),
@@ -121,7 +124,8 @@ dsh18 <- DESeq(ddsh18, test = "Wald", fitType = "parametric")
 
 # get results
 resh18 = results(dsh18, cooksCutoff = FALSE)
-alpha = 0.05
+# we are going to set this to be more stringent because we got A LOT of taxa at 0.05.
+alpha = 0.01
 sigtabh18 = resh18[which(resh18$padj < alpha), ]
 sigtabh18 = cbind(as(sigtabh18, "data.frame"), as(tax_table(H18)[rownames(sigtabh18), ], "matrix"))
 write.csv(sigtabh18, file = "tables/rumen-H-0v18.csv")
@@ -137,7 +141,8 @@ x = sort(x, TRUE)
 sigtabh18$Genus = factor(as.character(sigtabh18$Genus), levels=names(x))
 sigtabh18
 
-pH18 <- ggdotchart(sigtabh18, y = "log2FoldChange", x = "Genus",
+# pH18 <- 
+  ggdotchart(sigtabh18, y = "log2FoldChange", x = "Genus",
                  color = "Phylum",
                  sorting = "descending",
                  add = "segments", add.params = list(size = 2, alpha = 0.5, linetype = "dashed"),
@@ -171,7 +176,8 @@ dsa2 <- DESeq(ddsa2, test = "Wald", fitType = "parametric")
 
 # get results
 resa2 = results(dsa2, cooksCutoff = FALSE)
-alpha = 0.05
+# we are going to set this to be more stringent because we got A LOT of taxa at 0.05.
+alpha = 0.01
 sigtaba2 = resa2[which(resa2$padj < alpha), ]
 sigtaba2 = cbind(as(sigtaba2, "data.frame"), as(tax_table(A2)[rownames(sigtaba2), ], "matrix"))
 write.csv(sigtaba2, file = "tables/rumen-A-0v2.csv")
@@ -187,7 +193,8 @@ x = sort(x, TRUE)
 sigtaba2$Genus = factor(as.character(sigtaba2$Genus), levels=names(x))
 sigtaba2
 
-pA2 <- ggdotchart(sigtaba2, y = "log2FoldChange", x = "Genus",
+# pA2 <- 
+  ggdotchart(sigtaba2, y = "log2FoldChange", x = "Genus",
                    color = "Phylum",
                    sorting = "descending",
                    add = "segments", add.params = list(size = 2, alpha = 0.5, linetype = "dashed"),
@@ -221,9 +228,11 @@ dsa18 <- DESeq(ddsa18, test = "Wald", fitType = "parametric")
 
 # get results
 resa18 = results(dsa18, cooksCutoff = FALSE)
-alpha = 0.05
+# we are going to set this to be more stringent because we got A LOT of taxa at 0.05.
+alpha = 0.01
 sigtaba18 = resa18[which(resa18$padj < alpha), ]
 sigtaba18 = cbind(as(sigtaba18, "data.frame"), as(tax_table(A18)[rownames(sigtaba18), ], "matrix"))
+sigtaba18
 write.csv(sigtaba18, file = "tables/rumen-A-0v18.csv")
 
 ## plot
@@ -237,7 +246,8 @@ x = sort(x, TRUE)
 sigtaba18$Genus = factor(as.character(sigtaba18$Genus), levels=names(x))
 sigtaba18
 
-pA18 <- ggdotchart(sigtaba18, y = "log2FoldChange", x = "Genus",
+# pA18 <- 
+  ggdotchart(sigtaba18, y = "log2FoldChange", x = "Genus",
                    color = "Phylum",
                    sorting = "descending",
                    add = "segments", add.params = list(size = 2, alpha = 0.5, linetype = "dashed"),
@@ -261,7 +271,7 @@ ggsave("plots/rumen-A-0v18-diff-rel-abund-deseq.pdf", dpi = 600, width = 12, hei
 
 (ph2|pH18)/(pA2|pH18)
 
-ggsave("plots/diff-rel-abund-time-all.pdf", dpi = 600, width = 12, height = 8)
+ggsave("plots/diff-rel-abund-time-all.pdf", dpi = 600, width = 12, height = 20)
 
 ph2|pH18
 ggsave("plots/diff-rel-abund-holstein-all.pdf", dpi = 600, width = 24, height = 8)
