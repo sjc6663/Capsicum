@@ -99,6 +99,86 @@ H_rumen_rel <- H_rumen_rel %>%
     SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
   ) 
 
+H_con <- subset_samples(
+  H_rumen_rel,
+  SampleBinary == "Control"
+)
+
+H_cap <- subset_samples(
+  H_rumen_rel,
+  SampleBinary == "Capsicum"
+)
+
+# PCA plot for all hours - Holstein Control
+conh <- H_con %>% 
+  # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
+  tax_transform(trans = "clr", rank = "Genus") %>%
+  ord_calc(method = "PCA") %>% 
+  ord_plot(color = "Hour", plot_taxa = 1:5, size = 2) +
+  scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
+  stat_ellipse(aes(group = Hour, color = Hour)) +
+  theme_classic() +
+  ggtitle("Control-Holstein") +
+  # theme(legend.position = "none") +
+  labs(caption = "")
+conh
+
+# PCA plot for all hours - Holstein Capsicum
+caph <- H_cap %>% 
+  # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
+  tax_transform(trans = "clr", rank = "Genus") %>%
+  ord_calc(method = "PCA") %>% 
+  ord_plot(color = "Hour", plot_taxa = 1:5, size = 2) +
+  scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
+  stat_ellipse(aes(group = Hour, color = Hour)) +
+  theme_classic() +
+  ggtitle("Capsicum-Holstein") +
+  # theme(legend.position = "none") +
+  labs(caption = "")
+caph
+
+conh|caph
+
+A_con <- subset_samples(
+  A_rumen_rel,
+  SampleBinary == "Control"
+)
+
+A_cap <- subset_samples(
+  A_rumen_rel,
+  SampleBinary == "Capsicum"
+)
+
+# PCA plot for all hours - Holstein Control
+cona <- A_con %>% 
+  # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
+  tax_transform(trans = "clr", rank = "Genus") %>%
+  ord_calc(method = "PCA") %>% 
+  ord_plot(color = "Hour", plot_taxa = 1:5, size = 2) +
+  scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
+  stat_ellipse(aes(group = Hour, color = Hour)) +
+  theme_classic() +
+  ggtitle("Control-Angus") +
+  # theme(legend.position = "none") +
+  labs(caption = "")
+cona
+
+# PCA plot for all hours - Holstein Capsicum
+capa <- A_cap %>% 
+  # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
+  tax_transform(trans = "clr", rank = "Genus") %>%
+  ord_calc(method = "PCA") %>% 
+  ord_plot(color = "Hour", plot_taxa = 1:5, size = 2) +
+  scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
+  stat_ellipse(aes(group = Hour, color = Hour)) +
+  theme_classic() +
+  ggtitle("Capsicum-Angus") +
+  # theme(legend.position = "none") +
+  labs(caption = "")
+capa
+
+cona|capa
+
 ## ---- H0 vs H2 (Holstein) ----
 
 # define the quick hour segment
