@@ -118,8 +118,8 @@ conh <- H_con %>%
   scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
-  ggtitle("Control-Holstein") +
-  # theme(legend.position = "none") +
+  ggtitle("A") +
+  theme(legend.position = "none") +
   labs(caption = "")
 conh
 
@@ -132,7 +132,7 @@ caph <- H_cap %>%
   scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
-  ggtitle("Capsicum-Holstein") +
+  ggtitle("B") +
   # theme(legend.position = "none") +
   labs(caption = "")
 caph
@@ -158,8 +158,8 @@ cona <- A_con %>%
   scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
-  ggtitle("Control-Angus") +
-  # theme(legend.position = "none") +
+  ggtitle("C") +
+  theme(legend.position = "none") +
   labs(caption = "")
 cona
 
@@ -172,12 +172,16 @@ capa <- A_cap %>%
   scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
-  ggtitle("Capsicum-Angus") +
+  ggtitle("D") +
   # theme(legend.position = "none") +
   labs(caption = "")
 capa
 
 cona|capa
+
+(conh|caph)/(cona|capa)
+
+ggsave(filename = "plots/PCA-hours-all.pdf", dpi = 600)
 
 ## ---- H0 vs H2 (Holstein) ----
 
