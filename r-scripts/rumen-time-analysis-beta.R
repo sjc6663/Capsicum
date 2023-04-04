@@ -35,6 +35,15 @@ sample_data(H_rumen_rel)$"Hour" <- factor(sample_data(H_rumen_rel)$"Hour",
                                                levels = c("H0", "H2", "H6", "H12", "H18"))
 
 
+## Pairwise Adonis By Hour ----
+
+# pairwise adonis test
+H_df <- pairwise.adonis(H_cap_dm, sample_data(H_trans_cap)$Hour)
+
+write.csv(H_df, file = "tables/H-pairwise-adonis-hour.csv")
+
+A_df <- pairwise.adonis(A_cap_dm, sample_data(A_trans_cap)$Hour)
+write.csv(A_df, file = "tables/A-pairwise-adonis-hour.csv")
 
 ### ---- BETA DIVERSITY ----
 
@@ -47,13 +56,39 @@ A_trans <- A_rumen_rel %>%
   tax_transform(trans = "clr", rank = "Genus") %>% 
   ps_get()
 
+H_trans_con <- H_con %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+H_trans_cap <- H_cap %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+A_trans_con <- A_con %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+A_trans_cap <- A_cap %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
 # generate distance matrix
 H_dm <- phyloseq::distance(H_trans, method = "euclidean")
 A_dm <- phyloseq::distance(A_trans, method = "euclidean")
 
+H_con_dm <- phyloseq::distance(H_trans_con, method = "euclidean")
+H_cap_dm <- phyloseq::distance(H_trans_cap, method = "euclidean")
+A_con_dm <- phyloseq::distance(A_trans_con, method = "euclidean")
+A_cap_dm <- phyloseq::distance(A_trans_cap, method = "euclidean")
+
 #ADONIS test
 vegan::adonis2(H_dm ~ phyloseq::sample_data(H_trans)$Hour) # p = 0.001***
 vegan::adonis2(A_dm ~ phyloseq::sample_data(A_trans)$Hour) # p = 0.002**
+
+vegan::adonis2(H_con_dm ~ phyloseq::sample_data(H_trans_con)$Hour) # p = 0.306
+vegan::adonis2(A_con_dm ~ phyloseq::sample_data(A_trans_con)$Hour) # p = 0.439
+vegan::adonis2(H_cap_dm ~ phyloseq::sample_data(H_trans_cap)$Hour) # p = 0.001***
+vegan::adonis2(A_cap_dm ~ phyloseq::sample_data(A_trans_cap)$Hour) # p = 0.023*
 
 ##  PCA plot - fecal - holstein
 A <- H_rumen_rel %>% 
@@ -138,7 +173,7 @@ caph <- H_cap %>%
 caph
 
 conh|caph
-hplots <- ggarrange(conh, caph, common.legend = TRUE, legend = "bottom")
+hplots <- ggarrange(conh, caph, common.legend = TRUE, legend = "right")
 hplots​
 
 pdf("hplots.pdf")
@@ -189,7 +224,9 @@ cona|capa
 
 (conh|caph)/(cona|capa)
 
-aplots <- ggarrange(cona, capa, common.legend = TRUE, legend = "bottom")
+aplots <- ggarrange(cona, capa, common.legend = TRUE, legend = "right")
+
+ggsave(plot = aplots, filename = "plots/PCA-angus-rumen-all.pdf", dpi = 600, width = 12, height = 6)
 
 all <- ggarrange(conh, caph, cona, capa,
                               ncol = 2, nrow = 2, 
