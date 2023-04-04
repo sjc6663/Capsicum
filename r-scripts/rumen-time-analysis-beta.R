@@ -133,11 +133,19 @@ caph <- H_cap %>%
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
   ggtitle("B") +
-  # theme(legend.position = "none") +
+  theme(legend.position = "none") +
   labs(caption = "")
 caph
 
 conh|caph
+hplots <- ggarrange(conh, caph, common.legend = TRUE, legend = "bottom")
+hplots​
+
+pdf("hplots.pdf")
+hplots
+dev.off()
+
+ggsave(plot = hplots, filename = "plots/H-cap-con.pdf", dpi = 600, width = 12, height = 6)
 
 A_con <- subset_samples(
   A_rumen_rel,
@@ -181,7 +189,13 @@ cona|capa
 
 (conh|caph)/(cona|capa)
 
-ggsave(filename = "plots/PCA-hours-all.pdf", dpi = 600)
+aplots <- ggarrange(cona, capa, common.legend = TRUE, legend = "bottom")
+
+all <- ggarrange(conh, caph, cona, capa,
+                              ncol = 2, nrow = 2, 
+                              common.legend = TRUE, legend = "bottom")
+
+ggsave(plot = all, filename = "plots/PCA-hours-all.pdf", dpi = 600, width = 12, height = 15)
 
 ## ---- H0 vs H2 (Holstein) ----
 
