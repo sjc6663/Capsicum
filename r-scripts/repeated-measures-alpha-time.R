@@ -30,6 +30,12 @@ adivH <- data.frame(
   "SteerID" = phyloseq::sample_data(H_rumen_counts)$Steer.ID
 )
 
+testHr <- aov(Shannon ~ Treatment, data = adivH)
+summary(testHr)
+
+testAr <- aov(Shannon ~ Treatment, data = adivA)
+summary(testAr)
+
 # repeated measures anova ----
 # https://m-clark.github.io/docs/mixedModels/anovamixed.html 
 
@@ -42,6 +48,9 @@ summary(anovaH) #  F = 0.969, P = 0.488, Df = 12
 # hour came up significant so I checked just for curiositys sake
 testH <- aov(Shannon ~ Hour, data = adivH)
 summary(testH) # p = 0.0044**
+
+testA <- aov(Shannon ~ Hour, data = adivA)
+summary(testA)
 
 TukeyHSD(testH)
 
