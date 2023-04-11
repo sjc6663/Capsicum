@@ -43,6 +43,8 @@ summary(anovaH) #  F = 0.969, P = 0.488, Df = 12
 testH <- aov(Shannon ~ Hour, data = adivH)
 summary(testH) # p = 0.0044**
 
+TukeyHSD(testH)
+
 ## box plots -----
 sample_data(H_rumen_counts)$"Hour" <- factor(sample_data(H_rumen_counts)$"Hour", 
                                              levels = c("H0", "H2", "H6", "H12", "H18")) 
@@ -71,3 +73,32 @@ A|B
 
 ggsave(filename = "plots/alpha-div-rumen-all.pdf", dpi = 600)
 
+
+# lineplot ----
+
+adivH$"Hour" <- factor(adivH$"Hour", 
+               levels = c("H0", "H2", "H6", "H12", "H18"))
+
+adivH2$"Treatment" <- factor(adivH2$"Treatment", 
+                                                  levels = c("Control", "RPC5", "RPC10", "RPC15"))
+
+#adivH2 <- adivH %>% 
+#  group_by(Treatment, Hour) %>% 
+#  summarize(mean = mean(Shannon),
+#            sd = sd(Shannon))
+
+#adivH2 %>% 
+#  ggplot(aes(x = Hour, y = mean, group = Treatment, color = Treatment)) +
+#  geom_line() +
+#  geom_point() +
+#  geom_errorbar(aes(ymin = mean - sd,
+#                    ymax = mean + sd)) +
+#  scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) + 
+#  ggtitle("Shannon's Diversity with Treatment over Time") +
+#  theme_classic() +
+#  ylab("Shannon's Diversity Index")
+
+adivH %>% 
+ggline(x = "Hour", y = "Shannon", group = "Treatment", color = "Treatment", palette = c("#a76119", "#028571", "#dfc27d", "#80cdc1"), add = "mean_sd", error.plot = "errorbar")
+
+ggsave(filename = "plots/geomline-plot-Hrumen-time.pdf", dpi = 600)
