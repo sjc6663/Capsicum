@@ -1,0 +1,1144 @@
+---
+title: "Capsicum Analysis"
+author: "Stephanie Bierly"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# set our global root directory
+knitr::opts_knit$set(root.dir = "/Users/stephanieclouser/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/Shared-Projects/Capsicum/7.Data-Analysis/Capsicum/Data-Analysis/16S-Capsicum-Analysis")
+
+```
+
+## Breed Comparison
+
+Alpha Diversity 
+```{r, message=FALSE, warning=FALSE, results="hide"}
+library(phyloseq)
+library(microViz)
+library(ggplot2)
+
+set.seed(81299)
+
+## ---- load phyloseq objects ----
+load("ps-obj/phyloseq-fecal-samples-only-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-only-counts.RData")
+
+# check if we have NAs
+# anyNA(tax_table(fecal_counts)[,"Phylum"])
+# anyNA(tax_table(rumen_counts)[,"Phylum"])
+
+# tax fix our phyloseq object
+fecal_counts <- tax_fix(fecal_counts)
+rumen_counts <- tax_fix(rumen_counts)
+fecal_counts <- fecal_counts %>% tax_fix(unknowns = c("Incertae Sedis"))
+rumen_counts <- rumen_counts %>% tax_fix(unknowns = c("Incertae Sedis"))
+
+# glom to Genus level
+psgf <- fecal_counts %>% tax_glom("Genus")
+psgr <- rumen_counts %>% tax_glom("Genus")
+
+#Generate a data.frame with adiv measures (richness types and what groups we want to compare)
+adivf <- data.frame(
+  "Observed" = phyloseq::estimate_richness(psgf, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(psgf, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(psgf)$Treatment, 
+  "Breed" = phyloseq::sample_data(psgf)$Breed)
+# head(adivf)
+adivr <- data.frame(
+  "Observed" = phyloseq::estimate_richness(psgr, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(psgr, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(psgr)$Treatment,
+  "Breed" = phyloseq::sample_data(psgr)$Breed)
+# head(adivr)
+
+# fit a linear model to test for assumptions of parametric tests
+# modf <- lm(Observed ~ Treatment, data = adivf)
+# modr <- lm(Observed ~ Treatment, data = adivr)
+
+# plot the redisuals
+# hist(resid(modf))
+# hist(resid(modr))
+
+# plot a normality plot 
+# qqnorm(resid(modf))
+
+# add a normal line
+# qqline(resid(modf))
+
+# repeat for rumen
+# qqnorm(resid(modr))
+# qqline(resid(modr))
+```
+
+```{r}
+## ---- Shannon ANOVA with Holstein and Angus ----
+testFB <- aov(Shannon ~ Breed, data = adivf)
+summary(testFB) # P = 0.0589
+
+testRB <- aov(Shannon ~ Breed, data = adivr)
+summary(testRB) # P = 0.729
+```
+
+Beta Diversity 
+```{r, message=FALSE, warning=FALSE, results="hide"}
+
+library(phyloseq)
+library(microViz)
+library(ggplot2)
+library(vegan)
+
+set.seed(81299)
+
+## ---- load relative abundance phyloseqs ----
+load("ps-obj/phyloseq-fecal-samples-only-relabund.RData")
+load("ps-obj/phyloseq-rumen-samples-only-relabund.RData")
+
+## ---- Tax Fix ----
+### From here on out you have to run doubles, so one for fecal and one for rumen ###
+
+# check if we have NAs
+# anyNA(tax_table(fecal_rel)[,"Phylum"])
+# anyNA(tax_table(rumen_rel)[,"Phylum"])
+
+# tax fix our phyloseq object
+fecal_rel <- tax_fix(fecal_rel)
+rumen_rel <- tax_fix(rumen_rel)
+
+fecal_rel <- fecal_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+rumen_rel <- rumen_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+
+## ---- PERMANOVA ----
+
+# transform
+transform_fecal <- microbiome::transform(fecal_rel, 'clr')
+transform_rumen <- microbiome::transform(rumen_rel, 'clr')
+
+# generate distance matrix
+dist_matrix_fec <- phyloseq::distance(transform_fecal, method = "euclidean")
+dist_matrix_rum <- phyloseq::distance(transform_rumen, method = "euclidean")
+```
+
+```{r}
+#ADONIS test
+vegan::adonis2(dist_matrix_fec ~ phyloseq::sample_data(transform_fecal)$Breed) # P = 0.001***
+vegan::adonis2(dist_matrix_rum ~ phyloseq::sample_data(transform_rumen)$Breed) # P = 0.438, sig diff in fecal but not rumen. Still going to treat them separately.
+```
+
+## Cross Over Effects
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+# Checking for Cross Over Effects
+# 8/19/2022 SJC
+
+# one number will be shannon diversity, beta diversity, diff rel abund, etc
+## ---- setup ----
+# load libraries and data
+library(phyloseq)
+library(microViz)
+library(tidyverse)
+library(vegan)
+library(dplyr)
+
+set.seed(81299)
+
+## ---- setup for Holstein Counts ----
+# load in Holstein Fecal and Rumen Counts
+load("ps-obj/phyloseq-fecal-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-counts.RData")
+
+# load in effect coding table
+dat <- readxl::read_xlsx("metadata/Extraction_IDs.xlsx",
+                         sheet = "effect-coding")
+
+# head(dat)
+
+# renamed Steer ID to match, rename Treatment so it DOESN'T match, change Period to match
+dat1 <- dat %>% rename(Steer.ID = Steer, Treatment.1 = Treatment) %>% 
+  mutate(Period = paste0("P", Period))
+
+# join with old sample data - FECAL
+Hf_newsampledat <- samdat_tbl(H_fecal_counts) %>% 
+  dplyr::select(Steer.ID, .sample_name, Breed, Period) %>% 
+  left_join(dat1) %>% 
+  column_to_rownames(var = ".sample_name")
+
+# create a new sample data
+sample_data(H_fecal_counts) = Hf_newsampledat
+
+# add new sample data to phyloseq object
+# head(sample_data(H_fecal_counts))
+
+# join with old sample data - RUMEN
+Hr_newsampledat <- samdat_tbl(H_rumen_counts) %>% 
+  dplyr::select(Steer.ID, .sample_name, Breed, Period) %>% 
+  left_join(dat1) %>% 
+  column_to_rownames(var = ".sample_name")
+
+# create a new sample data
+sample_data(H_rumen_counts) = Hr_newsampledat
+
+# head(sample_data(H_rumen_counts))
+
+
+## ---- cross over effects = ALPHA DIVERSITY + HOLSTEIN ----
+# create data frame 
+adivHf <- data.frame(
+  "Observed" = phyloseq::estimate_richness(H_fecal_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(H_fecal_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(H_fecal_counts)$Treatment)
+# head(adivHf)
+
+# create data frame 
+adivHr <- data.frame(
+  "Observed" = phyloseq::estimate_richness(H_rumen_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(H_rumen_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(H_rumen_counts)$Treatment)
+# head(adivHr)
+
+# change rownames to column 
+dHf <- rownames_to_column(adivHf, var = ".sample_name")
+dHr <- rownames_to_column(adivHr, var = ".sample_name")
+
+# merge data frames together to get our variables with our Shannon Diveristy values
+bothHf <- dHf %>% merge(Hf_newsampledat)
+bothHr <- dHr %>% merge(Hr_newsampledat)
+```
+
+```{r}
+# check for crossover effects 
+modHf <- lm(Shannon ~ Treatment + x1 + x2, data = bothHf)
+summary(modHf) # no effects
+
+modHr <- lm(Shannon ~ Treatment + x1 + x2, data = bothHr)
+summary(modHr) # no effects
+```
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+## ---- setup for Angus Counts ----
+# load in Angus Fecal and Rumen Counts
+load("ps-obj/phyloseq-fecal-samples-angus-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-angus-counts.RData")
+
+# load in effect coding table
+dat <- readxl::read_xlsx("metadata/Extraction_IDs.xlsx",
+                         sheet = "effect-coding")
+
+ #head(dat)
+
+# renamed Steer ID to match, rename Treatment so it DOESN'T match, change Period to match
+dat1 <- dat %>% rename(Steer.ID = Steer, Treatment.1 = Treatment) %>% 
+  mutate(Period = paste0("P", Period))
+
+# join with old sample data - FECAL
+Af_newsampledat <- samdat_tbl(A_fecal_counts) %>% 
+  dplyr::select(Steer.ID, .sample_name, Breed, Period) %>% 
+  left_join(dat1) %>% 
+  column_to_rownames(var = ".sample_name")
+
+# create a new sample data
+sample_data(A_fecal_counts) = Af_newsampledat
+
+# add new sample data to phyloseq object
+# head(sample_data(A_fecal_counts))
+
+# join with old sample data - RUMEN
+Ar_newsampledat <- samdat_tbl(A_rumen_counts) %>% 
+  dplyr::select(Steer.ID, .sample_name, Breed, Period) %>% 
+  left_join(dat1) %>% 
+  column_to_rownames(var = ".sample_name")
+
+# create a new sample data
+sample_data(A_rumen_counts) = Ar_newsampledat
+
+# head(sample_data(A_rumen_counts))
+## ---- cross over effects = ALPHA DIVERSITY + ANGUS ----
+# create data frame 
+adivAf <- data.frame(
+  "Observed" = phyloseq::estimate_richness(A_fecal_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(A_fecal_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(A_fecal_counts)$Treatment)
+# head(adivAf)
+
+# create data frame 
+adivAr <- data.frame(
+  "Observed" = phyloseq::estimate_richness(A_rumen_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(A_rumen_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(A_rumen_counts)$Treatment)
+# head(adivAr)
+
+# change rownames to column 
+dAf <- rownames_to_column(adivAf, var = ".sample_name")
+dAr <- rownames_to_column(adivAr, var = ".sample_name")
+
+# merge data frames together to get our variables with our Shannon Diveristy values
+bothAf <- dAf %>% merge(Af_newsampledat)
+bothAr <- dAr %>% merge(Ar_newsampledat)
+```
+
+```{r}
+# check for crossover effects 
+modAf <- lm(Shannon ~ Treatment + x1 + x2, data = bothAf)
+summary(modAf) # no effects
+
+modAr <- lm(Shannon ~ Treatment + x1 + x2, data = bothAr)
+summary(modAr) # no effects
+```
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+## ---- setup for Holstein Rel Abund ----
+# use phyloseq objects from Alpha Diversity because they already have the x1 and x2 in them
+# clr transform data
+H_transform_fecal <- microbiome::transform(H_fecal_counts, 'clr')
+# sample_data(H_transform_fecal)
+
+H_transform_rumen <- microbiome::transform(H_rumen_counts, 'clr')
+# sample_data(H_transform_rumen)
+
+## ---- cross over effects = BETA DIVERSITY + HOLSTEIN ----
+
+# FECAL
+# pull out OTU table as data frame
+OTUHf <- as(sample_data(H_transform_fecal), "matrix")
+OTUdHf <- as.data.frame(OTUHf)
+# head(OTUdHf)
+OTUdHf1 <- rownames_to_column(OTUdHf, var = ".sample_name")
+# head(OTUdHf1)
+
+# generate distance matrix
+H_fecal_dist_matrix <- phyloseq::distance(H_transform_fecal, method = "euclidean")
+
+# check the significance with treatment and crossover identifiers
+mod_dmHf <- vegan::adonis2(H_fecal_dist_matrix ~ Treatment.1 + x1 + x2, data = OTUdHf1)
+mod_dmHf # no effect
+
+# RUMEN
+# pull out OTU table as data frame
+OTUHr <- as(sample_data(H_transform_rumen), "matrix")
+OTUdHr <- as.data.frame(OTUHr)
+# head(OTUdHr)
+OTUdHr1 <- rownames_to_column(OTUdHr, var = ".sample_name")
+# head(OTUdHr1)
+
+# generate distance matrix
+H_rumen_dist_matrix <- phyloseq::distance(H_transform_rumen, method = "euclidean")
+
+# check the significance with treatment and crossover identifiers
+mod_dmHr <- vegan::adonis2(H_rumen_dist_matrix ~ Treatment.1 + x1 + x2, data = OTUdHr1)
+mod_dmHr # x1 is significant so we are seeing a significant effect on beta diversity in rumen for the order
+
+## ---- setup for Angus Rel Abund ----
+# use phyloseq objects from Alpha Diversity because they already have the x1 and x2 in them
+# clr transform data
+A_transform_fecal <- microbiome::transform(A_fecal_counts, 'clr')
+# sample_data(A_transform_fecal)
+
+A_transform_rumen <- microbiome::transform(A_rumen_counts, 'clr')
+# sample_data(A_transform_rumen)
+
+## ---- cross over effects = BETA DIVERSITY + ANGUS ----
+
+# FECAL
+# pull out OTU table as data frame
+OTUAf <- as(sample_data(A_transform_fecal), "matrix")
+OTUdAf <- as.data.frame(OTUAf)
+# head(OTUdAf)
+OTUdAf1 <- rownames_to_column(OTUdAf, var = ".sample_name")
+# head(OTUdAf1)
+
+# generate distance matrix
+A_fecal_dist_matrix <- phyloseq::distance(A_transform_fecal, method = "euclidean")
+```
+
+```{r}
+# check the significance with treatment and crossover identifiers
+mod_dmAf <- vegan::adonis2(A_fecal_dist_matrix ~ Treatment.1 + x1 + x2, data = OTUdAf1)
+mod_dmAf # no effect
+```
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+# RUMEN
+# pull out OTU table as data frame
+OTUAr <- as(sample_data(A_transform_rumen), "matrix")
+OTUdAr <- as.data.frame(OTUAr)
+# head(OTUdAr)
+OTUdAr1 <- rownames_to_column(OTUdAr, var = ".sample_name")
+# head(OTUdAr1)
+
+# generate distance matrix
+A_rumen_dist_matrix <- phyloseq::distance(A_transform_rumen, method = "euclidean")
+```
+
+```{r}
+# check the significance with treatment and crossover identifiers
+mod_dmAr <- vegan::adonis2(A_rumen_dist_matrix ~ Treatment.1 + x1 + x2, data = OTUdAr1)
+mod_dmAr # x1 and x2 are significant so we are seeing a significant effect on beta diversity in rumen for the order
+
+```
+
+## Relative Abundance
+
+Fecal Samples
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+# load necessary packages
+library(phyloseq)
+library(microViz)
+library(ggplot2)
+library(plyr)
+library(patchwork)
+
+set.seed(81299)
+
+load("ps-obj/phyloseq-fecal-samples-only-relabund.RData")
+# load("ps-obj/phyloseq-rumen-samples-only-relabund.RData")
+
+# check if we have NAs
+# anyNA(tax_table(fecal_rel)[,"Phylum"])
+# anyNA(tax_table(rumen_rel)[,"Phylum"])
+
+# tax fix our phyloseq object
+fecal_rel <- tax_fix(fecal_rel)
+# rumen_rel <- tax_fix(rumen_rel)
+
+fecal_rel <- fecal_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+# rumen_rel <- rumen_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+
+## Separate out by treatment ----
+
+FC <- subset_samples(
+  fecal_rel,
+  Treatment == "Control"
+)
+
+F5 <- subset_samples(
+  fecal_rel,
+  Treatment == "RPC5"
+)
+
+F10 <- subset_samples(
+ fecal_rel,
+  Treatment == "RPC10"
+)
+
+F15 <- subset_samples(
+  fecal_rel,
+  Treatment == "RPC15"
+)
+
+## ---- Plot in ggplot2 ----
+# The palette with grey:
+cbPalette <- c("#003C30", "#8C510A",  "#35978F", "#BF812D", "#DFC27D", "#80CDC1", "#999999", "#01665E",  "#F6E8C3", "#543005", "#F5F5F5")
+
+pC <- ggplot(data = psmelt(FC), mapping = aes_string(x = "Period", y = "Abundance")) +
+  geom_bar(aes(fill = Phylum), stat = "identity", position = "fill") +
+  scale_fill_manual(values = cbPalette) +
+  labs(x = NULL, y = "Relative Abundance",
+       title = "Control") +
+  theme_bw() +
+  facet_grid(~Breed) +
+  theme(legend.position = "none")
+
+#pC
+
+#ggsave(plot = pC, filename = "plots/rel-abund-control-fecal.pdf", dpi = 600)
+
+p5 <- ggplot(data = psmelt(F5), mapping = aes_string(x = "Period", y = "Abundance")) +
+  geom_bar(aes(fill = Phylum), stat = "identity", position = "fill") +
+  scale_fill_manual(values = cbPalette) +
+  labs(x = NULL, y = "Relative Abundance",
+       title = "RPC5") +
+  theme_bw() +
+  facet_grid(~Breed) 
+
+#p5
+
+#ggsave(plot = p5, filename = "plots/rel-abund-rpc5-fecal.pdf", dpi = 600)
+
+p10 <- ggplot(data = psmelt(F10), mapping = aes_string(x = "Period", y = "Abundance")) +
+  geom_bar(aes(fill = Phylum), stat = "identity", position = "fill") +
+  scale_fill_manual(values = cbPalette) +
+  labs(x = NULL, y = "Relative Abundance",
+       title = "RPC10") +
+  theme_bw() +
+  facet_grid(~Breed) +
+  theme(legend.position = "none")
+
+#p10
+
+#ggsave(plot = p10, filename = "plots/rel-abund-rpc10-fecal.pdf", dpi = 600)
+
+p15 <- ggplot(data = psmelt(F15), mapping = aes_string(x = "Period", y = "Abundance")) +
+  geom_bar(aes(fill = Phylum), stat = "identity", position = "fill") +
+  scale_fill_manual(values = cbPalette) +
+  labs(x = NULL, y = "Relative Abundance",
+       title = "RPC15") +
+  theme_bw() +
+  facet_grid(~Breed) +
+  theme(legend.position = "none")
+
+#p15
+
+#ggsave(plot = p15, filename = "plots/rel-abund-rpc15-fecal.pdf", dpi = 600)
+```
+
+```{r}
+(pC|p5)/(p10|p15)
+
+#ggsave(filename = "plots/rel-abund-fecal-all.pdf", dpi = 600, width = 12, height = 12)
+
+```
+
+Rumen Samples
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+# load necessary packages
+library(phyloseq)
+library(microViz)
+library(ggplot2)
+library(plyr)
+library(patchwork)
+
+set.seed(81299)
+
+load("ps-obj/phyloseq-rumen-samples-only-relabund.RData")
+
+# check if we have NAs
+# anyNA(tax_table(rumen_rel)[,"Phylum"])
+
+# tax fix our phyloseq object
+rumen_rel <- tax_fix(rumen_rel)
+
+
+rumen_rel <- rumen_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+
+sample_data(rumen_rel)$"Hour" <- factor(sample_data(rumen_rel)$"Hour", 
+                                        levels = c("H0", "H2", "H6", "H12", "H18"))
+
+## Separate out by treatment ----
+
+RC <- subset_samples(
+  rumen_rel,
+  Treatment == "Control"
+)
+
+R5 <- subset_samples(
+  rumen_rel,
+  Treatment == "RPC5"
+)
+
+R10 <- subset_samples(
+  rumen_rel,
+  Treatment == "RPC10"
+)
+
+R15 <- subset_samples(
+  rumen_rel,
+  Treatment == "RPC15"
+)
+
+## plot ----
+# The palette with grey:
+cbPalette <- c("#003C30", "#8C510A",  "#35978F", "#BF812D", "#DFC27D", "#80CDC1", "#999999", "#01665E",  "#F6E8C3", "#543005", "#F5F5F5")
+
+pC <- ggplot(data = psmelt(RC), mapping = aes_string(x = "Hour", y = "Abundance")) +
+  geom_bar(aes(fill = Phylum), stat = "identity", position = "fill") +
+  scale_fill_manual(values = cbPalette) +
+  labs(x = NULL, y = "Relative Abundance",
+       title = "Control") +
+  theme_bw() +
+  facet_grid(~Breed) +
+  theme(legend.position = "none")
+
+
+# ggsave(filename = "plots/rel-abund-control-rumen.pdf", dpi = 600)
+
+p5 <- ggplot(data = psmelt(R5), mapping = aes_string(x = "Hour", y = "Abundance")) +
+  geom_bar(aes(fill = Phylum), stat = "identity", position = "fill") +
+  scale_fill_manual(values = cbPalette) +
+  labs(x = NULL, y = "Relative Abundance",
+       title = "RPC5") +
+  theme_bw() +
+  facet_grid(~Breed) 
+
+
+# ggsave(filename = "plots/rel-abund-rpc5-rumen.pdf", dpi = 600)
+
+p10 <- ggplot(data = psmelt(R10), mapping = aes_string(x = "Hour", y = "Abundance")) +
+  geom_bar(aes(fill = Phylum), stat = "identity", position = "fill") +
+  scale_fill_manual(values = cbPalette) +
+  labs(x = NULL, y = "Relative Abundance",
+       title = "RPC10") +
+  theme_bw() +
+  facet_grid(~Breed) +
+  theme(legend.position = "none")
+
+
+# ggsave(filename = "plots/rel-abund-rpc10-rumen.pdf", dpi = 600)
+
+p15 <- ggplot(data = psmelt(R15), mapping = aes_string(x = "Hour", y = "Abundance")) +
+  geom_bar(aes(fill = Phylum), stat = "identity", position = "fill") +
+  scale_fill_manual(values = cbPalette) +
+  labs(x = NULL, y = "Relative Abundance",
+       title = "RPC15") +
+  theme_bw() +
+  facet_grid(~Breed) + 
+  theme(legend.position = "none")
+
+
+# ggsave(filename = "plots/rel-abund-rpc15-rumen.pdf", dpi = 600)
+```
+
+```{r}
+(pC|p5)/(p10|p15)
+
+# ggsave(filename = "plots/rel-abund-rumen-all.pdf", dpi = 600, width = 12, height = 12)
+
+```
+
+## Alpha Diversity by Treatment
+
+Fecal and Rumen Samples
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+library(phyloseq)
+library(microViz)
+library(tidyverse)
+library(ggpubr)
+library(patchwork)
+
+set.seed(81299)
+
+## ---- load phyloseq objects ----
+load("ps-obj/phyloseq-fecal-samples-angus-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-angus-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-counts.RData")
+
+# check if we have any NAs
+#anyNA(tax_table(A_rumen_counts)[,"Phylum"])
+#anyNA(tax_table(H_rumen_counts)[,"Phylum"])
+# anyNA(tax_table(A_fecal_counts)[,"Phylum"])
+# anyNA(tax_table(H_fecal_counts)[,"Phylum"])
+
+# tax fix our phyloseq object
+A_fecal_counts <- tax_fix(A_fecal_counts)
+H_fecal_counts <- tax_fix(H_fecal_counts)
+A_rumen_counts <- tax_fix(A_rumen_counts)
+H_rumen_counts <- tax_fix(H_rumen_counts)
+
+# individual tax fix
+A_fecal_counts <- A_fecal_counts %>% tax_fix(unknowns = c("Incertae Sedis"))
+H_fecal_counts <- H_fecal_counts %>% tax_fix(unknowns = c("Incertae Sedis"))
+A_rumen_counts <- A_rumen_counts %>% tax_fix(unknowns = c("Incertae Sedis"))
+H_rumen_counts <- H_rumen_counts %>% tax_fix(unknowns = c("Incertae Sedis"))
+
+## ---- create data frames for each breed and type ----
+adivHf <- data.frame(
+  # "Observed" = phyloseq::estimate_richness(H_fecal_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(H_fecal_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(H_fecal_counts)$Treatment 
+)
+# head(adivHf)
+# write.csv(adivHf,"tables/holstein-fecal.csv", row.names = FALSE)
+
+
+adivHr <- data.frame(
+ "Observed" = phyloseq::estimate_richness(H_rumen_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(H_rumen_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(H_rumen_counts)$Treatment 
+)
+#head(adivHr)
+#write.csv(adivHr,"tables/holstein-rumen.csv", row.names = FALSE)
+
+adivAf <- data.frame(
+  # "Observed" = phyloseq::estimate_richness(A_fecal_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(A_fecal_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(A_fecal_counts)$Treatment 
+)
+# head(adivAf)
+# write.csv(adivAf,"tables/angus-fecal.csv", row.names = FALSE)
+
+adivAr <- data.frame(
+ "Observed" = phyloseq::estimate_richness(A_rumen_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(A_rumen_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(A_rumen_counts)$Treatment 
+)
+#head(adivAr)
+#write.csv(adivAr,"tables/angus-rumen.csv", row.names = FALSE)
+```
+
+```{r}
+## ---- Shannon ANOVA with Holstein and Angus ----
+testHf <- aov(Shannon ~ Treatment, data = adivHf)
+summary(testHf) # p = 0.0865
+
+testHr <- aov(Shannon ~ Treatment, data = adivHr)
+summary(testHr)
+
+testAf <- aov(Shannon ~ Treatment, data = adivAf)
+summary(testAf) # p = 0.14
+
+testAr <- aov(Shannon ~ Treatment, data = adivAr)
+summary(testAr)
+
+```
+
+## Alpha Diversity by Time
+
+Rumen Samples Only
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+load("ps-obj/phyloseq-rumen-samples-angus-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-counts.RData")
+
+# load packages
+library(phyloseq)
+library(microViz)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(rstatix)
+
+set.seed(81299)
+
+# create data frames ----
+adivA <- data.frame(
+  # "Observed" = phyloseq::estimate_richness(H_fecal_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(A_rumen_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(A_rumen_counts)$Treatment,
+  "Hour" = phyloseq::sample_data(A_rumen_counts)$Hour,
+  "SteerID" = phyloseq::sample_data(A_rumen_counts)$Steer.ID
+)
+
+adivH <- data.frame(
+  # "Observed" = phyloseq::estimate_richness(H_fecal_counts, measures = "Observed"),
+  "Shannon" = phyloseq::estimate_richness(H_rumen_counts, measures = "Shannon"),
+  "Treatment" = phyloseq::sample_data(H_rumen_counts)$Treatment,
+  "Hour" = phyloseq::sample_data(H_rumen_counts)$Hour,
+  "SteerID" = phyloseq::sample_data(H_rumen_counts)$Steer.ID
+)
+
+#testHr <- aov(Shannon ~ Treatment, data = adivH)
+#summary(testHr)
+
+#testAr <- aov(Shannon ~ Treatment, data = adivA)
+#summary(testAr)
+
+# repeated measures anova ----
+# https://m-clark.github.io/docs/mixedModels/anovamixed.html 
+```
+
+```{r}
+anovaA <- aov(Shannon ~ Treatment*Hour + Error(SteerID), data = adivA)
+summary(anovaA) #  F = 1.090, P = 0.386, Df = 12
+
+anovaH <- aov(Shannon ~ Treatment*Hour + Error(SteerID), data = adivH)
+summary(anovaH) #  F = 0.969, P = 0.488, Df = 12
+```
+
+## Beta Diversity by Treatment
+
+Fecal Samples and Rumen Samples
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+# load packages
+library(BiocManager)
+library(phyloseq)
+library(vegan)
+library(patchwork)
+library(pairwiseAdonis)
+
+set.seed(81299)
+
+# load phyloseq objects
+load("ps-obj/phyloseq-fecal-samples-angus-relabund.RData")
+load("ps-obj/phyloseq-fecal-samples-holstein-relabund.RData")
+load("ps-obj/phyloseq-rumen-samples-angus-relabund.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-relabund.RData")
+
+# check if we have NAs
+#anyNA(tax_table(H_fecal_rel)[,"Phylum"])
+#anyNA(tax_table(H_rumen_rel)[,"Phylum"])
+#anyNA(tax_table(A_fecal_rel)[,"Phylum"])
+#anyNA(tax_table(A_rumen_rel)[,"Phylum"])
+
+# tax fix our phyloseq object
+A_fecal_rel <- tax_fix(A_fecal_rel)
+A_rumen_rel <- tax_fix(A_rumen_rel)
+H_fecal_rel <- tax_fix(H_fecal_rel)
+H_rumen_rel <- tax_fix(H_rumen_rel)
+
+A_fecal_rel <- A_fecal_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+A_rumen_rel <- A_rumen_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+H_fecal_rel <- H_fecal_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+H_rumen_rel <- H_rumen_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+
+# transform
+H_transform_fecal <- microbiome::transform(H_fecal_rel, 'clr')
+H_transform_rumen <- microbiome::transform(H_rumen_rel, 'clr')
+A_transform_fecal <- microbiome::transform(A_fecal_rel, 'clr')
+A_transform_rumen <- microbiome::transform(A_rumen_rel, 'clr')
+
+## ---- PERMANOVA @ Genus Level ----
+# clr transform phyloseq objects at Genus level
+H_trans_fecal <- H_fecal_rel %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+A_trans_fecal <- A_fecal_rel %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+A_trans_rumen <- A_rumen_rel %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+H_trans_rumen <- H_rumen_rel %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+# generate distance matrix
+H_fecal_dist_matrix_trans <- phyloseq::distance(H_trans_fecal, method = "euclidean")
+A_fecal_dist_matrix_trans <- phyloseq::distance(A_trans_fecal, method = "euclidean")
+A_rumen_dist_matrix_trans <- phyloseq::distance(A_trans_rumen, method = "euclidean")
+H_rumen_dist_matrix_trans <- phyloseq::distance(H_trans_rumen, method = "euclidean")
+```
+
+```{r}
+#ADONIS test
+vegan::adonis2(H_fecal_dist_matrix_trans ~ phyloseq::sample_data(H_trans_fecal)$Treatment) # p = 0.001
+vegan::adonis2(A_fecal_dist_matrix_trans ~ phyloseq::sample_data(A_trans_fecal)$Treatment) # p = 0.384
+vegan::adonis2(H_rumen_dist_matrix_trans ~ phyloseq::sample_data(H_trans_rumen)$Treatment)
+vegan::adonis2(A_rumen_dist_matrix_trans ~ phyloseq::sample_data(A_trans_rumen)$Treatment)
+
+# Pairwise Adonis for Holstein Samples
+H_df <- pairwise.adonis(H_fecal_dist_matrix_trans, sample_data(H_trans_fecal)$Treatment)
+H_df
+
+```
+
+## Beta Diversity by Time
+
+Rumen Samples Only
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+# load packages
+library(BiocManager)
+library(phyloseq)
+library(vegan)
+library(patchwork)
+library(microViz)
+library(ggplot2)
+library(dplyr)
+library(stringr)
+library(pairwiseAdonis)
+
+set.seed(81299)
+
+# load phyloseq objects
+load("ps-obj/phyloseq-rumen-samples-angus-relabund.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-relabund.RData")
+
+# check if we have NAs
+#anyNA(tax_table(H_rumen_rel)[,"Phylum"])
+#anyNA(tax_table(A_rumen_rel)[,"Phylum"])
+
+# tax fix our phyloseq object
+A_rumen_rel <- tax_fix(A_rumen_rel)
+H_rumen_rel <- tax_fix(H_rumen_rel)
+
+
+A_rumen_rel <- A_rumen_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+H_rumen_rel <- H_rumen_rel %>% tax_fix(unknowns = c("Incertae Sedis"))
+
+# put the time series in order
+sample_data(A_rumen_rel)$"Hour" <- factor(sample_data(A_rumen_rel)$"Hour", 
+                                                  levels = c("H0", "H2", "H6", "H12", "H18"))
+ sample_data(H_rumen_rel)$"Hour" <- factor(sample_data(H_rumen_rel)$"Hour", 
+                                               levels = c("H0", "H2", "H6", "H12", "H18"))
+
+H_rumen_rel <- H_rumen_rel %>% 
+  ps_mutate(
+    SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
+  ) 
+
+H_con <- subset_samples(H_rumen_rel,
+  SampleBinary == "Control"
+)
+
+H_cap <- subset_samples(H_rumen_rel,
+                        SampleBinary == "Capsicum")
+  
+# give samples a column to descripe capsicum or no capsicum
+A_rumen_rel <- A_rumen_rel %>% 
+  ps_mutate(
+    SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
+  ) 
+
+A_con <- subset_samples(A_rumen_rel,
+                        SampleBinary == "Control")
+
+A_cap <- subset_samples(A_rumen_rel,
+                        SampleBinary == "Capsicum")
+
+### ---- BETA DIVERSITY ----
+
+# clr transform phyloseq objects at Genus level
+H_trans <- H_rumen_rel %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+A_trans <- A_rumen_rel %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+H_trans_con <- H_con %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+H_trans_cap <- H_cap %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+A_trans_con <- A_con %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+A_trans_cap <- A_cap %>% 
+  tax_transform(trans = "clr", rank = "Genus") %>% 
+  ps_get()
+
+# generate distance matrix
+H_dm <- phyloseq::distance(H_trans, method = "euclidean")
+A_dm <- phyloseq::distance(A_trans, method = "euclidean")
+
+H_con_dm <- phyloseq::distance(H_trans_con, method = "euclidean")
+H_cap_dm <- phyloseq::distance(H_trans_cap, method = "euclidean")
+A_con_dm <- phyloseq::distance(A_trans_con, method = "euclidean")
+A_cap_dm <- phyloseq::distance(A_trans_cap, method = "euclidean")
+```
+
+```{r}
+#ADONIS test
+vegan::adonis2(H_dm ~ phyloseq::sample_data(H_trans)$Hour) # p = 0.001***
+vegan::adonis2(A_dm ~ phyloseq::sample_data(A_trans)$Hour) # p = 0.002**
+
+vegan::adonis2(H_con_dm ~ phyloseq::sample_data(H_trans_con)$Hour) # p = 0.306
+vegan::adonis2(A_con_dm ~ phyloseq::sample_data(A_trans_con)$Hour) # p = 0.439
+vegan::adonis2(H_cap_dm ~ phyloseq::sample_data(H_trans_cap)$Hour) # p = 0.001***
+vegan::adonis2(A_cap_dm ~ phyloseq::sample_data(A_trans_cap)$Hour) # p = 0.023*
+
+## Pairwise Adonis By Hour ----
+
+# pairwise adonis test
+H_df <- pairwise.adonis(H_cap_dm, sample_data(H_trans_cap)$Hour)
+H_df
+#write.csv(H_df, file = "tables/H-pairwise-adonis-hour.csv")
+
+H_df2 <- pairwise.adonis(H_con_dm, sample_data(H_trans_con)$Hour)
+H_df2
+
+A_df <- pairwise.adonis(A_cap_dm, sample_data(A_trans_cap)$Hour)
+A_df
+#write.csv(A_df, file = "tables/A-pairwise-adonis-hour.csv")
+
+A_df2 <- pairwise.adonis(A_con_dm, sample_data(A_trans_con)$Hour)
+A_df2
+```
+
+## Differential Relative Abundance
+
+Capsaicin (5, 10, 15) vs. Control
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+require(tidyverse)
+require(phyloseq)
+library(BiocManager)
+#BiocManager::install("ALDEx2")
+library(ALDEx2)
+library(microViz)
+
+set.seed(81299)
+
+# load phyloseq of counts
+load("ps-obj/phyloseq-fecal-samples-angus-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-angus-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-counts.RData")
+
+# aggregate at genus level for counts
+A_fecal_counts <- A_fecal_counts %>%
+  tax_fix(unknowns = c("Incertae Sedis")) %>%
+  tax_fix()
+
+H_fecal_counts <- H_fecal_counts %>%
+  tax_fix(unknowns = c("Incertae Sedis")) %>%
+  tax_fix()
+
+A_rumen_counts <- A_rumen_counts %>%
+  tax_fix(unknowns = c("Incertae Sedis")) %>%
+  tax_fix()
+
+H_rumen_counts <- H_rumen_counts %>%
+  tax_fix(unknowns = c("Incertae Sedis")) %>%
+  tax_fix()
+
+A_fecal_counts <- A_fecal_counts %>% 
+  ps_mutate(
+    SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
+  ) 
+
+H_fecal_counts <- H_fecal_counts %>% 
+  ps_mutate(
+    SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
+  ) 
+
+A_rumen_counts <- A_rumen_counts %>% 
+  ps_mutate(
+    SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
+  ) 
+
+H_rumen_counts <- H_rumen_counts %>% 
+  ps_mutate(
+    SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
+  ) 
+
+# transpose OTU to make ALDEx2 happy
+H_pscount3<-t(otu_table(H_fecal_counts))
+A_pscount3 <- t(otu_table(A_fecal_counts))
+AR_pscount3 <- t(otu_table(A_rumen_counts))
+HR_pscount3 <- t(otu_table(H_rumen_counts))
+
+# run AlDEx2 function
+H_aldex2_da <- ALDEx2::aldex(data.frame(H_pscount3), phyloseq::sample_data(H_fecal_counts)$SampleBinary, taxa_rank = "all", norm = "CLR", method = "t.test", p_adjust = "BH", pvalue_cutoff = 0.05, mc_samples = 128, denom = "iqlr")
+A_aldex2_da <- ALDEx2::aldex(data.frame(A_pscount3), phyloseq::sample_data(A_fecal_counts)$SampleBinary, taxa_rank = "all", norm = "CLR", method = "t.test", p_adjust = "BH", pvalue_cutoff = 0.05, mc_samples = 128, denom = "iqlr")
+
+
+
+AR_aldex2_da <- ALDEx2::aldex(data.frame(AR_pscount3), phyloseq::sample_data(A_rumen_counts)$SampleBinary, taxa_rank = "all", norm = "CLR", method = "t.test", p_adjust = "BH", pvalue_cutoff = 0.05, mc_samples = 128, denom = "iqlr")
+HR_aldex2_da <- ALDEx2::aldex(data.frame(HR_pscount3), phyloseq::sample_data(H_rumen_counts)$SampleBinary, taxa_rank = "all", norm = "CLR", method = "t.test", p_adjust = "BH", pvalue_cutoff = 0.05, mc_samples = 128, denom = "iqlr")
+
+```
+
+```{r}
+# look to see if anything is significant (this is for nonparametric, parametric use we.eBH)
+AR_sig_aldex2 <- AR_aldex2_da %>%
+  filter(wi.eBH < 0.05) 
+AR_sig_aldex2 # no significantly different taxa
+
+HR_sig_aldex2 <- HR_aldex2_da %>%
+  filter(wi.eBH < 0.05) 
+HR_sig_aldex2 # no significantly different taxa
+
+H_sig_aldex2 <- H_aldex2_da %>%
+  filter(wi.eBH < 0.05) 
+H_sig_aldex2 # no significantly different taxa
+
+A_sig_aldex2 <- A_aldex2_da %>%
+  filter(wi.eBH < 0.05) 
+A_sig_aldex2 # no significantly different taxa
+```
+
+Time Comparisons
+
+0 v 2 and 0 v 18
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+library(microViz)
+library(phyloseq)
+library(ALDEx2)
+library(dplyr)
+library(tibble)
+
+set.seed(81299)
+
+# load phyloseq of counts
+load("ps-obj/phyloseq-fecal-samples-angus-counts.RData")
+load("ps-obj/phyloseq-fecal-samples-holstein-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-angus-counts.RData")
+load("ps-obj/phyloseq-rumen-samples-holstein-counts.RData")
+
+# subset out H0~H2 and H0~H18
+
+quick <- c("H0", "H2")
+long <- c("H0", "H18")
+
+hquick <- subset_samples(
+  H_rumen_counts,
+  Hour %in% quick)
+
+hlong <- subset_samples(
+  H_rumen_counts,
+  Hour %in% long
+)
+
+aquick <- subset_samples(
+  A_rumen_counts,
+  Hour %in% quick
+)
+
+along <- subset_samples(
+  A_rumen_counts,
+  Hour %in% long
+)
+
+# transpose OTU to make ALDEx2 happy
+hq3 <-t(otu_table(hquick))
+hl3 <- t(otu_table(hlong))
+aq3 <- t(otu_table(aquick))
+al3 <- t(otu_table(along))
+
+# run AlDEx2 function
+hq_aldex2_da <- ALDEx2::aldex(data.frame(hq3), phyloseq::sample_data(hquick)$Hour, taxa_rank = "all", norm = "CLR", method = "t.test", p_adjust = "BH", pvalue_cutoff = 0.05, mc_samples = 128, denom = "iqlr")
+hl_aldex2_da <- ALDEx2::aldex(data.frame(hl3), phyloseq::sample_data(hlong)$Hour, taxa_rank = "all", norm = "CLR", method = "t.test", p_adjust = "BH", pvalue_cutoff = 0.05, mc_samples = 128, denom = "iqlr")
+aq_aldex2_da <- ALDEx2::aldex(data.frame(aq3), phyloseq::sample_data(aquick)$Hour, taxa_rank = "all", norm = "CLR", method = "t.test", p_adjust = "BH", pvalue_cutoff = 0.05, mc_samples = 128, denom = "iqlr")
+al_aldex2_da <- ALDEx2::aldex(data.frame(al3), phyloseq::sample_data(along)$Hour, taxa_rank = "all", norm = "CLR", method = "t.test", p_adjust = "BH", pvalue_cutoff = 0.05, mc_samples = 128, denom = "iqlr")
+```
+
+```{r}
+# look to see if anything is significant (this is for nonparametric, parametric use we.eBH)
+hq_sig_aldex2 <- hq_aldex2_da %>%
+  filter(wi.eBH < 0.05) 
+hq_sig_aldex2 # one (1) significantly different taxa
+
+hl_sig_aldex2 <- hl_aldex2_da %>%
+  filter(wi.eBH < 0.05) 
+hl_sig_aldex2 # no significantly different taxa
+
+aq_sig_aldex2 <- aq_aldex2_da %>%
+  filter(wi.eBH < 0.05) 
+aq_sig_aldex2 # no significantly different taxa
+
+al_sig_aldex2 <- al_aldex2_da %>%
+  filter(wi.eBH < 0.05) 
+al_sig_aldex2 # no significantly different taxa
+```
+
+```{r, message=FALSE, warning=FALSE, results="hide"}
+# setup tax table to be able to merge
+hq_taxa_info <- data.frame(tax_table(hquick))
+
+hq_taxa_info <- hq_taxa_info %>% rownames_to_column(var = "OTU")
+hq_sig_aldex2 <- hq_sig_aldex2 %>% rownames_to_column(var = "OTU")
+
+# make a table of significant corrected p-values
+hq_sig_aldex2 <- hq_aldex2_da %>%
+  rownames_to_column(var = "OTU") %>%
+  filter(wi.eBH < 0.05) %>%
+  arrange(effect, wi.eBH) %>%
+  dplyr::select(OTU, diff.btw, diff.win, effect, wi.ep, wi.eBH)
+```
+
+```{r}
+# add in previously formed taxa information to complete the table
+hq_sig_aldex2 <- left_join(hq_sig_aldex2, hq_taxa_info) # Lactobacillus
+hq_sig_aldex2
+```
