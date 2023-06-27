@@ -1,6 +1,10 @@
 # Shannon's Diversity Index for Breeds
 # 11-14-22 SAB
 
+library(phyloseq)
+library(microViz)
+library(ggplot2)
+
 ## ---- load phyloseq objects ----
 load("ps-obj/phyloseq-fecal-samples-only-counts.RData")
 load("ps-obj/phyloseq-rumen-samples-only-counts.RData")
@@ -53,7 +57,7 @@ qqline(resid(modr))
 
 ## ---- Shannon ANOVA with Holstein and Angus ----
 testFB <- aov(Shannon ~ Breed, data = adivf)
-summary(testFB)
+summary(testFB) # P = 0.0589
 
 testRB <- aov(Shannon ~ Breed, data = adivr)
-summary(testRB)
+summary(testRB) # P = 0.729

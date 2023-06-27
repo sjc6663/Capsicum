@@ -89,8 +89,8 @@ pC <- ggplot(data = psmelt(FC), mapping = aes_string(x = "Period", y = "Abundanc
   labs(x = NULL, y = "Relative Abundance",
        title = "Control") +
   theme_bw() +
-  facet_grid(~Breed) 
-  #theme(legend.position = "none")
+  facet_grid(~Breed) +
+  theme(legend.position = "none")
 
 pC
 
@@ -114,8 +114,8 @@ p10 <- ggplot(data = psmelt(F10), mapping = aes_string(x = "Period", y = "Abunda
   labs(x = NULL, y = "Relative Abundance",
        title = "RPC10") +
   theme_bw() +
-  facet_grid(~Breed) 
-  #theme(legend.position = "none")
+  facet_grid(~Breed) +
+  theme(legend.position = "none")
 
 p10
 
@@ -127,8 +127,8 @@ p15 <- ggplot(data = psmelt(F15), mapping = aes_string(x = "Period", y = "Abunda
   labs(x = NULL, y = "Relative Abundance",
        title = "RPC15") +
   theme_bw() +
-  facet_grid(~Breed) 
-  # theme(legend.position = "none")
+  facet_grid(~Breed) +
+  theme(legend.position = "none")
 
 p15
 

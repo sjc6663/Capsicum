@@ -34,5 +34,5 @@ dist_matrix_fec <- phyloseq::distance(transform_fecal, method = "euclidean")
 dist_matrix_rum <- phyloseq::distance(transform_rumen, method = "euclidean")
 
 #ADONIS test
-vegan::adonis2(dist_matrix_fec ~ phyloseq::sample_data(transform_fecal)$Breed)
-vegan::adonis2(dist_matrix_rum ~ phyloseq::sample_data(transform_rumen)$Breed)
+vegan::adonis2(dist_matrix_fec ~ phyloseq::sample_data(transform_fecal)$Breed) # P = 0.001***
+vegan::adonis2(dist_matrix_rum ~ phyloseq::sample_data(transform_rumen)$Breed) # P = 0.438, sig diff in fecal but not rumen. Still going to treat them separately.

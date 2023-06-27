@@ -12,6 +12,7 @@ library(microViz)
 library(ggplot2)
 library(tidyr)
 library(dplyr)
+library(rstatix)
 
 # create data frames ----
 adivA <- data.frame(

@@ -7,6 +7,7 @@ library(BiocManager)
 library(phyloseq)
 library(vegan)
 library(patchwork)
+library(pairwiseAdonis)
 
 # load phyloseq objects
 load("ps-obj/phyloseq-fecal-samples-angus-relabund.RData")
@@ -66,6 +67,12 @@ vegan::adonis2(H_fecal_dist_matrix_trans ~ phyloseq::sample_data(H_trans_fecal)$
 vegan::adonis2(A_fecal_dist_matrix_trans ~ phyloseq::sample_data(A_trans_fecal)$Treatment) # p = 0.384
 #vegan::adonis2(H_rumen_dist_matrix_trans ~ phyloseq::sample_data(H_trans_rumen)$Treatment)
 #vegan::adonis2(A_rumen_dist_matrix_trans ~ phyloseq::sample_data(A_trans_rumen)$Treatment)
+
+# Pairwise Adonis for Holstein Samples
+H_df <- pairwise.adonis(H_fecal_dist_matrix_trans, sample_data(H_trans_fecal)$Treatment)
+H_df
+
+#write.csv(H_df, file = "tables/H-pairwise-adonis-hour.csv")
 
 
 ## ---- PCA Plots Holstein and Angus ----

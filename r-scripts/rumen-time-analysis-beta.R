@@ -34,16 +34,29 @@ sample_data(A_rumen_rel)$"Hour" <- factor(sample_data(A_rumen_rel)$"Hour",
 sample_data(H_rumen_rel)$"Hour" <- factor(sample_data(H_rumen_rel)$"Hour", 
                                                levels = c("H0", "H2", "H6", "H12", "H18"))
 
+H_rumen_counts <- H_rumen_counts %>% 
+  ps_mutate(
+    SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
+  ) 
 
-## Pairwise Adonis By Hour ----
+H_con <- subset_samples(H_rumen_counts,
+  SampleBinary == "Control"
+)
 
-# pairwise adonis test
-H_df <- pairwise.adonis(H_cap_dm, sample_data(H_trans_cap)$Hour)
+H_cap <- subset_samples(H_rumen_counts,
+                        SampleBinary == "Capsicum")
+  
+# give samples a column to descripe capsicum or no capsicum
+A_rumen_counts <- A_rumen_counts %>% 
+  ps_mutate(
+    SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
+  ) 
 
-write.csv(H_df, file = "tables/H-pairwise-adonis-hour.csv")
+A_con <- subset_samples(A_rumen_counts,
+                        SampleBinary == "Control")
 
-A_df <- pairwise.adonis(A_cap_dm, sample_data(A_trans_cap)$Hour)
-write.csv(A_df, file = "tables/A-pairwise-adonis-hour.csv")
+A_cap <- subset_samples(A_rumen_counts,
+                        SampleBinary == "Capsicum")
 
 ### ---- BETA DIVERSITY ----
 
@@ -89,6 +102,17 @@ vegan::adonis2(H_con_dm ~ phyloseq::sample_data(H_trans_con)$Hour) # p = 0.306
 vegan::adonis2(A_con_dm ~ phyloseq::sample_data(A_trans_con)$Hour) # p = 0.439
 vegan::adonis2(H_cap_dm ~ phyloseq::sample_data(H_trans_cap)$Hour) # p = 0.001***
 vegan::adonis2(A_cap_dm ~ phyloseq::sample_data(A_trans_cap)$Hour) # p = 0.023*
+
+## Pairwise Adonis By Hour ----
+
+# pairwise adonis test
+H_df <- pairwise.adonis(H_cap_dm, sample_data(H_trans_cap)$Hour)
+
+write.csv(H_df, file = "tables/H-pairwise-adonis-hour.csv")
+
+A_df <- pairwise.adonis(A_cap_dm, sample_data(A_trans_cap)$Hour)
+write.csv(A_df, file = "tables/A-pairwise-adonis-hour.csv")
+
 
 ##  PCA plot - fecal - holstein
 A <- H_rumen_rel %>% 
