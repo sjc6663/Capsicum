@@ -99,4 +99,4 @@ ggsave(filename = "plots/rel-abund-rpc15-rumen.pdf", dpi = 600)
 
 (pC|p5)/(p10|p15)
 
-ggsave(filename = "plots/rel-abund-rumen-all.pdf", dpi = 600, width = 12, height = 12)
+ggsave(filename = "plots/rel-abund-rumen-all.jpeg", dpi = 600, width = 12, height = 12)

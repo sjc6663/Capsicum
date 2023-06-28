@@ -1,6 +1,8 @@
 # Checking for Cross Over Effects
 # 8/19/2022 SJC
 
+## Save this code for reference and to show that we did it but we're not including this in the paper due to long adaptation period which can serve as a wash out.
+
 # one number will be shannon diversity, beta diversity, diff rel abund, etc
 ## ---- setup ----
 # load libraries and data

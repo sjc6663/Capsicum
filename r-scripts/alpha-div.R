@@ -85,6 +85,7 @@ sample_data(H_fecal_counts)$"Treatment" <- factor(sample_data(H_fecal_counts)$"T
                                                   levels = c("Control", "RPC5", "RPC10", "RPC15"))
 A <- plot_richness(H_fecal_counts, x="Treatment", measures=c("Shannon"), title = "A", color = "Treatment") + 
   geom_boxplot() + 
+  geom_jitter() +
   scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) +
   theme_classic() +
   theme(legend.position = "none")
@@ -104,6 +105,7 @@ sample_data(A_fecal_counts)$"Treatment" <- factor(sample_data(A_fecal_counts)$"T
                                                   levels = c("Control", "RPC5", "RPC10", "RPC15"))
 B <- plot_richness(A_fecal_counts, x="Treatment", measures=c("Shannon"), title = "B", color = "Treatment") + 
   geom_boxplot() + 
+  geom_jitter() +
   scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) + 
   theme_classic() +
   theme(legend.position = "none")

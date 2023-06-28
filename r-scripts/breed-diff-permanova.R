@@ -5,6 +5,8 @@
 library(phyloseq)
 library(microViz)
 
+set.seed(81299)
+
 ## ---- load relative abundance phyloseqs ----
 load("ps-obj/phyloseq-fecal-samples-only-relabund.RData")
 load("ps-obj/phyloseq-rumen-samples-only-relabund.RData")
@@ -36,3 +38,7 @@ dist_matrix_rum <- phyloseq::distance(transform_rumen, method = "euclidean")
 #ADONIS test
 vegan::adonis2(dist_matrix_fec ~ phyloseq::sample_data(transform_fecal)$Breed) # P = 0.001***
 vegan::adonis2(dist_matrix_rum ~ phyloseq::sample_data(transform_rumen)$Breed) # P = 0.438, sig diff in fecal but not rumen. Still going to treat them separately.
+
+
+vegan::adonis2(dist_matrix_rum ~ phyloseq::sample_data(transform_rumen)$Breed * phyloseq::sample_data(transform_rumen)$Hour)
+vegan::adonis2(dist_matrix_fec ~ phyloseq::sample_data(transform_fecal)$Breed + phyloseq::sample_data(transform_fecal)$Treatment) # treatment and breed effect here

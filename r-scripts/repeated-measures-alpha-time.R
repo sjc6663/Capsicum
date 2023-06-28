@@ -63,6 +63,7 @@ sample_data(H_rumen_counts)$"Treatment" <- factor(sample_data(H_rumen_counts)$"T
 
 A <- plot_richness(H_rumen_counts, x="Hour", measures=c("Shannon"), title = "A", color = "Treatment") + 
   geom_boxplot() + 
+  geom_jitter() +
   scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) + 
   theme_classic() + 
   theme(legend.position = "none")
@@ -75,13 +76,14 @@ sample_data(A_rumen_counts)$"Treatment" <- factor(sample_data(A_rumen_counts)$"T
 
 B <- plot_richness(A_rumen_counts, x="Hour", measures=c("Shannon"), title = "B", color = "Treatment") + 
   geom_boxplot() + 
+  geom_jitter() +
   scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) + 
   theme_classic() 
   theme(legend.position = "none")
 
 A|B
 
-ggsave(filename = "plots/alpha-div-rumen-all.pdf", dpi = 600)
+ggsave(filename = "plots/alpha-div-rumen-all.jpeg", dpi = 600)
 
 
 # lineplot ----
