@@ -63,10 +63,10 @@ A_rumen_dist_matrix_trans <- phyloseq::distance(A_trans_rumen, method = "euclide
 H_rumen_dist_matrix_trans <- phyloseq::distance(H_trans_rumen, method = "euclidean")
 
 #ADONIS test
-vegan::adonis2(H_fecal_dist_matrix_trans ~ phyloseq::sample_data(H_trans_fecal)$Treatment) # p = 0.001
-vegan::adonis2(A_fecal_dist_matrix_trans ~ phyloseq::sample_data(A_trans_fecal)$Treatment) # p = 0.384
-vegan::adonis2(H_rumen_dist_matrix_trans ~ phyloseq::sample_data(H_trans_rumen)$Treatment)
-vegan::adonis2(A_rumen_dist_matrix_trans ~ phyloseq::sample_data(A_trans_rumen)$Treatment)
+vegan::adonis2(H_fecal_dist_matrix_trans ~ phyloseq::sample_data(H_trans_fecal)$Treatment) # R2 = 0.52, P = 0.001
+vegan::adonis2(A_fecal_dist_matrix_trans ~ phyloseq::sample_data(A_trans_fecal)$Treatment) # R2 = 0.22, P = 0.384
+vegan::adonis2(H_rumen_dist_matrix_trans ~ phyloseq::sample_data(H_trans_rumen)$Treatment) # R2 = 0.03, P = 0.843 
+vegan::adonis2(A_rumen_dist_matrix_trans ~ phyloseq::sample_data(A_trans_rumen)$Treatment) # R2 = 0.04, P = 0.404
 
 # Pairwise Adonis for Holstein Samples
 H_df <- pairwise.adonis(H_fecal_dist_matrix_trans, sample_data(H_trans_fecal)$Treatment)
@@ -77,60 +77,76 @@ H_df
 
 ## ---- PCA Plots Holstein and Angus ----
 ##  PCA plot - fecal - holstein
+sample_data(H_fecal_rel)$"Treatment" <- factor(sample_data(H_fecal_rel)$"Treatment", 
+                                                  levels = c("Control", "RPC5", "RPC10", "RPC15"))
+
 A <- H_fecal_rel %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Treatment", shape = "Treatment", plot_taxa = 1:5, size = 2) +
-  scale_colour_brewer(palette = "BrBG") +
+  ord_plot(color = "Treatment", shape = "Treatment", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_colour_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1")) +
   stat_ellipse(aes(group = Treatment, color = Treatment)) +
   theme_classic() +
   ggtitle("A") +
   theme(legend.position = "none") +
-  labs(caption = "")
+  labs(caption = "R2 = 0.52, P = 0.001***")
 
 ggsave(filename = "plots/PCA-microViz-holstein-fecal.pdf", dpi = 600)
 
 ##  PCA plot - fecal - angus
+sample_data(A_fecal_rel)$"Treatment" <- factor(sample_data(A_fecal_rel)$"Treatment", 
+                                               levels = c("Control", "RPC5", "RPC10", "RPC15"))
+
 B <- A_fecal_rel %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Treatment", shape = "Treatment", plot_taxa = 1:5, size = 2) +
-  scale_colour_brewer(palette = "BrBG") +
+  ord_plot(color = "Treatment", shape = "Treatment", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_colour_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1")) +
   stat_ellipse(aes(group = Treatment, color = Treatment)) + 
   theme_classic() +
   ggtitle("B") + 
-  labs(caption = "")
+  labs(caption = "R2 = 0.22, P = 0.384")
 
 ggsave(filename = "plots/PCA-microViz-angus-fecal.pdf", dpi = 600)
 
+A|B
+
+ggsave(filename = "plots/PCA-fecal-only.pdf", dpi = 600, width = 12, height = 10)
+
 ##  PCA plot - fecal - treatment
+sample_data(H_rumen_rel)$"Treatment" <- factor(sample_data(H_rumen_rel)$"Treatment", 
+                                               levels = c("Control", "RPC5", "RPC10", "RPC15"))
+
 C <- H_rumen_rel %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Treatment", shape = "Treatment", plot_taxa = 1:5, size = 2) +
-  scale_colour_brewer(palette = "BrBG") +
+  ord_plot(color = "Treatment", shape = "Treatment", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_colour_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1")) +
   stat_ellipse(aes(group = Treatment, color = Treatment)) + 
   theme_classic() +
   ggtitle("C") +
   theme(legend.position = "none") +
-  labs(caption = "")
+  labs(caption = "R2 = 0.03, P = 0.843")
 
 ggsave(filename = "plots/PCA-microViz-rumen-holstein.pdf", dpi = 600)
 
 ##  PCA plot - fecal - treatment
+sample_data(A_rumen_rel)$"Treatment" <- factor(sample_data(A_rumen_rel)$"Treatment", 
+                                               levels = c("Control", "RPC5", "RPC10", "RPC15"))
+
 D <- A_rumen_rel %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Treatment", shape = "Treatment", plot_taxa = 1:5, size = 2) +
-  scale_colour_brewer(palette = "BrBG") +
+  ord_plot(color = "Treatment", shape = "Treatment", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_colour_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1")) +
   stat_ellipse(aes(group = Treatment, color = Treatment)) + 
   theme_classic() +
   ggtitle("D") +
-  labs(caption = "")
+  labs(caption = "R2 = 0.04, P = 0.404")
 
 D
 ggsave(filename = "plots/PCA-microViz-angus-rumen.pdf", dpi = 600)

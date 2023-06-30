@@ -86,7 +86,7 @@ sample_data(H_fecal_counts)$"Treatment" <- factor(sample_data(H_fecal_counts)$"T
 A <- plot_richness(H_fecal_counts, x="Treatment", measures=c("Shannon"), title = "A", color = "Treatment") + 
   geom_boxplot() + 
   geom_jitter() +
-  scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) +
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1")) +
   theme_classic() +
   theme(legend.position = "none")
 A
@@ -106,7 +106,7 @@ sample_data(A_fecal_counts)$"Treatment" <- factor(sample_data(A_fecal_counts)$"T
 B <- plot_richness(A_fecal_counts, x="Treatment", measures=c("Shannon"), title = "B", color = "Treatment") + 
   geom_boxplot() + 
   geom_jitter() +
-  scale_color_manual(values = c("#a76119", "#028571", "#dfc27d", "#80cdc1")) + 
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1")) + 
   theme_classic() +
   theme(legend.position = "none")
 B
@@ -124,10 +124,4 @@ ggsave(plot = B, filename = "plots/alpha-diversity-angus-fecal.pdf", dpi = 600)
 #(A|B)/(C|D)
 A|B
 ggsave(filename = "plots/shannon-diversity-all-fecal.pdf", dpi = 600)
-
-## ---- Rumen Time Series Analysis ----
-# can use repeated measures design for this 
-
-
-
 

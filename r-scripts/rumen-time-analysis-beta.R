@@ -12,6 +12,8 @@ library(ggplot2)
 library(dplyr)
 library(stringr)
 
+set.seed(081299)
+
 # load phyloseq objects
 load("ps-obj/phyloseq-rumen-samples-angus-relabund.RData")
 load("ps-obj/phyloseq-rumen-samples-holstein-relabund.RData")
@@ -34,28 +36,28 @@ sample_data(A_rumen_rel)$"Hour" <- factor(sample_data(A_rumen_rel)$"Hour",
 sample_data(H_rumen_rel)$"Hour" <- factor(sample_data(H_rumen_rel)$"Hour", 
                                                levels = c("H0", "H2", "H6", "H12", "H18"))
 
-H_rumen_counts <- H_rumen_counts %>% 
+H_rumen_rel <- H_rumen_rel %>% 
   ps_mutate(
     SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
   ) 
 
-H_con <- subset_samples(H_rumen_counts,
+H_con <- subset_samples(H_rumen_rel,
   SampleBinary == "Control"
 )
 
-H_cap <- subset_samples(H_rumen_counts,
+H_cap <- subset_samples(H_rumen_rel,
                         SampleBinary == "Capsicum")
   
 # give samples a column to descripe capsicum or no capsicum
-A_rumen_counts <- A_rumen_counts %>% 
+A_rumen_rel <- A_rumen_rel %>% 
   ps_mutate(
     SampleBinary = if_else(str_detect(Treatment,"Control"), true = "Control", false = "Capsicum")
   ) 
 
-A_con <- subset_samples(A_rumen_counts,
+A_con <- subset_samples(A_rumen_rel,
                         SampleBinary == "Control")
 
-A_cap <- subset_samples(A_rumen_counts,
+A_cap <- subset_samples(A_rumen_rel,
                         SampleBinary == "Capsicum")
 
 ### ---- BETA DIVERSITY ----
@@ -95,25 +97,79 @@ A_con_dm <- phyloseq::distance(A_trans_con, method = "euclidean")
 A_cap_dm <- phyloseq::distance(A_trans_cap, method = "euclidean")
 
 #ADONIS test
-vegan::adonis2(H_dm ~ phyloseq::sample_data(H_trans)$Hour) # p = 0.001***
-vegan::adonis2(A_dm ~ phyloseq::sample_data(A_trans)$Hour) # p = 0.002**
+vegan::adonis2(H_dm ~ phyloseq::sample_data(H_trans)$Treatment * phyloseq::sample_data(H_trans)$Hour) # R2 = 0.109, P = 1.00, ns
+vegan::adonis2(A_dm ~ phyloseq::sample_data(A_trans)$Treatment * phyloseq::sample_data(A_trans)$Hour) # R2 = 0.113, P = 0.99, ns
 
-vegan::adonis2(H_con_dm ~ phyloseq::sample_data(H_trans_con)$Hour) # p = 0.306
-vegan::adonis2(A_con_dm ~ phyloseq::sample_data(A_trans_con)$Hour) # p = 0.439
-vegan::adonis2(H_cap_dm ~ phyloseq::sample_data(H_trans_cap)$Hour) # p = 0.001***
-vegan::adonis2(A_cap_dm ~ phyloseq::sample_data(A_trans_cap)$Hour) # p = 0.023*
+vegan::adonis2(H_dm ~ phyloseq::sample_data(H_trans)$Hour) # R2 = 0.12, F = 2.63, P = 0.001
+vegan::adonis2(A_dm ~ phyloseq::sample_data(A_trans)$Hour) # R2 = 0.08, F = 1.72, P = 0.005
+
 
 ## Pairwise Adonis By Hour ----
 
 # pairwise adonis test
-H_df <- pairwise.adonis(H_cap_dm, sample_data(H_trans_cap)$Hour)
+H_df <- pairwise.adonis(H_dm, sample_data(H_trans)$Hour)
+H_df
 
 write.csv(H_df, file = "tables/H-pairwise-adonis-hour.csv")
 
-A_df <- pairwise.adonis(A_cap_dm, sample_data(A_trans_cap)$Hour)
+A_df <- pairwise.adonis(A_dm, sample_data(A_trans)$Hour)
+A_df
 write.csv(A_df, file = "tables/A-pairwise-adonis-hour.csv")
 
+## plots ----
+A <- H_rumen_rel %>% 
+  # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
+  tax_transform(trans = "clr", rank = "Genus") %>%
+  ord_calc(method = "PCA") %>% 
+  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
+  stat_ellipse(aes(group = Treatment, color = Treatment)) +
+  theme_classic() +
+  ggtitle("A") +
+  #theme(legend.position = "none") +
+  labs(caption = "")
 
+B <- A_rumen_rel %>% 
+  # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
+  tax_transform(trans = "clr", rank = "Genus") %>%
+  ord_calc(method = "PCA") %>% 
+  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
+  stat_ellipse(aes(group = Treatment, color = Treatment)) +
+  theme_classic() +
+  ggtitle("B") +
+  #theme(legend.position = "none") +
+  labs(caption = "")
+
+c <- H_rumen_rel %>% 
+  # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
+  tax_transform(trans = "clr", rank = "Genus") %>%
+  ord_calc(method = "PCA") %>% 
+  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
+  stat_ellipse(aes(group = Hour, color = Hour)) +
+  theme_classic() +
+  ggtitle("C") +
+  #theme(legend.position = "none") +
+  labs(caption = "")
+
+d <- A_rumen_rel %>% 
+  # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
+  tax_transform(trans = "clr", rank = "Genus") %>%
+  ord_calc(method = "PCA") %>% 
+  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
+  stat_ellipse(aes(group = Hour, color = Hour)) +
+  theme_classic() +
+  ggtitle("D") +
+  #theme(legend.position = "none") +
+  labs(caption = "")
+
+(A|B)/(c|d)
+
+ggsave(filename = "plots/PCA-time-stuff.pdf", dpi = 600, width = 12, height = 12)
+
+# control capsicum time plots ----
 ##  PCA plot - fecal - holstein
 A <- H_rumen_rel %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
@@ -168,13 +224,13 @@ H_cap <- subset_samples(
   SampleBinary == "Capsicum"
 )
 
-# PCA plot for all hours - Holstein Control
+# PCA plot for all hours - Holstein Control # these plots show the change over time for control steers and capsicum steers
 conh <- H_con %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Hour", plot_taxa = 1:5, size = 2) +
-  scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
+  ord_plot(color = "Hour", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
   ggtitle("A") +
@@ -187,8 +243,8 @@ caph <- H_cap %>%
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Hour", plot_taxa = 1:5, size = 2) +
-  scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
+  ord_plot(color = "Hour", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
   ggtitle("B") +
@@ -221,8 +277,8 @@ cona <- A_con %>%
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Hour", plot_taxa = 1:5, size = 2) +
-  scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
+  ord_plot(color = "Hour", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
   ggtitle("C") +
@@ -235,8 +291,8 @@ capa <- A_cap %>%
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Hour", plot_taxa = 1:5, size = 2) +
-  scale_color_manual(values = c( "#028571", "#80cdc1", "#dfc27d", "#a76119", "#543005")) +
+  ord_plot(color = "Hour", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  scale_color_manual(values =c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
   ggtitle("D") +
@@ -255,6 +311,8 @@ ggsave(plot = aplots, filename = "plots/PCA-angus-rumen-all.pdf", dpi = 600, wid
 all <- ggarrange(conh, caph, cona, capa,
                               ncol = 2, nrow = 2, 
                               common.legend = TRUE, legend = "bottom")
+
+all
 
 ggsave(plot = all, filename = "plots/PCA-hours-all.pdf", dpi = 600, width = 12, height = 15)
 
