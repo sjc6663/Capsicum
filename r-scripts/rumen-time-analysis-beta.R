@@ -126,7 +126,7 @@ A <- H_rumen_rel %>%
   stat_ellipse(aes(group = Treatment, color = Treatment)) +
   theme_classic() +
   ggtitle("A") +
-  #theme(legend.position = "none") +
+  theme(legend.position = "none") +
   labs(caption = "")
 
 B <- A_rumen_rel %>% 
@@ -150,7 +150,7 @@ c <- H_rumen_rel %>%
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
   ggtitle("C") +
-  #theme(legend.position = "none") +
+  theme(legend.position = "none") +
   labs(caption = "")
 
 d <- A_rumen_rel %>% 
@@ -167,7 +167,7 @@ d <- A_rumen_rel %>%
 
 (A|B)/(c|d)
 
-ggsave(filename = "plots/PCA-time-stuff.pdf", dpi = 600, width = 12, height = 12)
+ggsave(filename = "plots/PCA-time-stuff.jpeg", dpi = 600, width = 12, height = 12)
 
 # control capsicum time plots ----
 ##  PCA plot - fecal - holstein

@@ -11,14 +11,14 @@ library(patchwork)
 library(tibble)
 
 # load phyloseq objects
-psrel <- readRDS("ps-decontam-relabund.rds")
+psrel <- readRDS("ps-obj/ps-decontam-relabund.rds")
 #pscount <- readRDS("ps-decontam-filtered-counts.rds")
 
 psrel
 
 # merge everything at the Genus level so we don't have duplicates
 psgrel <- tax_glom(psrel, "Genus")
-psgcount <- tax_glom(pscount, "Genus")
+#psgcount <- tax_glom(pscount, "Genus")
 
 ## ---- separate out Rumen and Fecal Samples from relative abundance set ----
 fecal_rel <- subset_samples(
@@ -406,4 +406,4 @@ ggsave(plot = p15, filename = "plots/rel-abund-rpc15-fecal.pdf", dpi = 600)
 plots <- (A|B)/(C|D)
 plots
 
-ggsave(filename = "plots/rel-abund-fecal-all.pdf", dpi = 600, width = 18, height = 12)
+ggsave(filename = "plots/rel-abund-fecal-all.jpeg", dpi = 600, width = 18, height = 12)

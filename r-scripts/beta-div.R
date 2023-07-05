@@ -113,7 +113,7 @@ ggsave(filename = "plots/PCA-microViz-angus-fecal.pdf", dpi = 600)
 
 A|B
 
-ggsave(filename = "plots/PCA-fecal-only.pdf", dpi = 600, width = 12, height = 10)
+ggsave(filename = "plots/PCA-fecal-only.jpeg", dpi = 600, width = 12, height = 10)
 
 ##  PCA plot - fecal - treatment
 sample_data(H_rumen_rel)$"Treatment" <- factor(sample_data(H_rumen_rel)$"Treatment", 

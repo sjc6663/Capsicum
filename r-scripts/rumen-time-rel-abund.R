@@ -387,4 +387,4 @@ ggsave(filename = "plots/rel-abund-rpc15-rumen.pdf", dpi = 600)
 plots <- (A|B)/(C|D)
 plots
 
-ggsave(filename = "plots/rel-abund-rumen-time-all.pdf", dpi = 600, width = 18, height = 12)
+ggsave(filename = "plots/paper-plots/fig3.jpeg", dpi = 600, width = 18, height = 12)

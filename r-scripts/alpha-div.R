@@ -123,5 +123,5 @@ ggsave(plot = B, filename = "plots/alpha-diversity-angus-fecal.pdf", dpi = 600)
 
 #(A|B)/(C|D)
 A|B
-ggsave(filename = "plots/shannon-diversity-all-fecal.pdf", dpi = 600)
+ggsave(filename = "plots/shannon-diversity-all-fecal.jpeg", dpi = 600)
 

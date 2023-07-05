@@ -80,7 +80,7 @@ B <- plot_richness(A_rumen_counts, x="Hour", measures=c("Shannon"), title = "B",
   geom_jitter() +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1")) + 
   theme_classic() 
-  theme(legend.position = "none")
+ # theme(legend.position = "none")
 
 A|B
 
@@ -92,7 +92,7 @@ ggsave(filename = "plots/alpha-div-rumen-all.jpeg", dpi = 600)
 adivH$"Hour" <- factor(adivH$"Hour", 
                levels = c("H0", "H2", "H6", "H12", "H18"))
 
-adiv$"Treatment" <- factor(adiv$"Treatment", 
+adivH$"Treatment" <- factor(adivH$"Treatment", 
                                                   levels = c("Control", "RPC5", "RPC10", "RPC15"))
 
 #adivH2 <- adivH %>% 
@@ -120,7 +120,7 @@ my_comparisons <- list( c("H0, H2"), c("H0, H6"), c("H0", "H12"), c("H0", "H18")
 line + stat_compare_means(method = "anova", label.y = 1.4) + 
   stat_compare_means(aes(group = Treatment), label = "p.signif")
 
-ggsave(filename = "plots/geomline-plot-Hrumen-time.pdf", dpi = 600)
+ggsave(filename = "plots/geomline-plot-Hrumen-time.jpeg", dpi = 600)
 
 
 adiv <- data.frame(
