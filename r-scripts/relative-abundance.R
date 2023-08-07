@@ -324,7 +324,8 @@ A <- FC2 %>%
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
   ) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  theme(text = element_text(size = 20))
 
 ggsave(plot = pC, filename = "plots/rel-abund-control-fecal.pdf", dpi = 600)
 
@@ -348,7 +349,8 @@ B <- F52 %>%
   scale_y_continuous(
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
-  ) 
+  ) +
+  theme(text = element_text(size = 20))
 
 ggsave(plot = p5, filename = "plots/rel-abund-rpc5-fecal.pdf", dpi = 600)
 
@@ -373,7 +375,8 @@ C <- F102 %>%
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
   ) +
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme(text = element_text(size = 20))
 
 
 ggsave(plot = p10, filename = "plots/rel-abund-rpc10-fecal.pdf", dpi = 600)
@@ -399,7 +402,8 @@ D <- F152 %>%
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
   ) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  theme(text = element_text(size = 20))
 
 ggsave(plot = p15, filename = "plots/rel-abund-rpc15-fecal.pdf", dpi = 600)
 

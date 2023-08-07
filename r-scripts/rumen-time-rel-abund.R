@@ -297,7 +297,8 @@ A <- RC2 %>%
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
   ) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  theme(text = element_text(size = 20))
   
 ggsave(filename = "plots/rel-abund-control-rumen.pdf", dpi = 600, width = 12, height = 10)
 
@@ -325,7 +326,8 @@ B <- R52 %>%
   scale_y_continuous(
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
-  ) 
+  ) +
+  theme(text = element_text(size = 20))
 
 ggsave(filename = "plots/rel-abund-rpc5-rumen.pdf", dpi = 600)
 
@@ -352,7 +354,8 @@ C <- R102 %>%
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
   ) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  theme(text = element_text(size = 20))
 
 ggsave(filename = "plots/rel-abund-rpc10-rumen.pdf", dpi = 600)
 
@@ -379,7 +382,8 @@ D <- R152 %>%
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
   ) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  theme(text = element_text(size = 20))
 
 ggsave(filename = "plots/rel-abund-rpc15-rumen.pdf", dpi = 600)
 

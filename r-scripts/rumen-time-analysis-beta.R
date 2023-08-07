@@ -121,49 +121,53 @@ A <- H_rumen_rel %>%
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 5, fontface = "bold.italic", check_overlap = TRUE)) +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Treatment, color = Treatment)) +
   theme_classic() +
   ggtitle("A") +
   theme(legend.position = "none") +
-  labs(caption = "")
+  labs(caption = "R2 = 0.109, P = 1.00") +
+  theme(text = element_text(size = 20))
 
 B <- A_rumen_rel %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 5, fontface = "bold.italic", check_overlap = TRUE)) +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Treatment, color = Treatment)) +
   theme_classic() +
   ggtitle("B") +
   #theme(legend.position = "none") +
-  labs(caption = "")
+  labs(caption = "R2 = 0.113, P = 0.99") +
+  theme(text = element_text(size = 20))
 
 c <- H_rumen_rel %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 5, fontface = "bold.italic", check_overlap = TRUE)) +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
   ggtitle("C") +
   theme(legend.position = "none") +
-  labs(caption = "")
+  labs(caption = "R2 = 0.12, P = 0.001***") +
+  theme(text = element_text(size = 20))
 
 d <- A_rumen_rel %>% 
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 4, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
+  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 5, fontface = "bold.italic", check_overlap = TRUE)) +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
   ggtitle("D") +
   #theme(legend.position = "none") +
-  labs(caption = "")
+  labs(caption = "R2 = 0.08, P = 0.005***") +
+  theme(text = element_text(size = 20))
 
 (A|B)/(c|d)
 

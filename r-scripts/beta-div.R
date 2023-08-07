@@ -90,7 +90,8 @@ A <- H_fecal_rel %>%
   theme_classic() +
   ggtitle("A") +
   theme(legend.position = "none") +
-  labs(caption = "R2 = 0.52, P = 0.001***")
+  labs(caption = "R2 = 0.52, P = 0.001***") +
+  theme(text = element_text(size = 20))
 
 ggsave(filename = "plots/PCA-microViz-holstein-fecal.pdf", dpi = 600)
 
@@ -107,7 +108,8 @@ B <- A_fecal_rel %>%
   stat_ellipse(aes(group = Treatment, color = Treatment)) + 
   theme_classic() +
   ggtitle("B") + 
-  labs(caption = "R2 = 0.22, P = 0.384")
+  labs(caption = "R2 = 0.22, P = 0.384") +
+  theme(text = element_text(size = 20))
 
 ggsave(filename = "plots/PCA-microViz-angus-fecal.pdf", dpi = 600)
 
