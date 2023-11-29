@@ -8,6 +8,8 @@ library(phyloseq)
 library(vegan)
 library(patchwork)
 library(pairwiseAdonis)
+library(microViz)
+library(ggplot2)
 
 # load phyloseq objects
 load("ps-obj/phyloseq-fecal-samples-angus-relabund.RData")
@@ -89,7 +91,7 @@ A <- H_fecal_rel %>%
   stat_ellipse(aes(group = Treatment, color = Treatment)) +
   theme_classic() +
   ggtitle("A") +
-  theme(legend.position = "none") +
+  #theme(legend.position = "none") +
   labs(caption = "R2 = 0.52, P = 0.001***") +
   theme(text = element_text(size = 20))
 
