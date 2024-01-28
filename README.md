@@ -15,7 +15,17 @@ This file contains information about the raw reads. Obtained by running seqkit s
 ### metadata.csv
 This file contains all the metadata for all samples. 
 
-### 1
+### asv-table.RData
+This file contains the asv count information for all samples. This is an output file from dada2.
+
+### tax-table.RData
+This file contains the taxa information for all samples. This is an output file from dada2. 
+
+### phyloseq-fecal-counts.RData
+This is a phyloseq object of only fecal samples for both breeds. 
+
+### phyloseq-rumen-counts.RData
+This is a phyloseq object of only rumen samples for both breeds. 
 
 ## Scripts
 
@@ -26,6 +36,38 @@ This folder contains all scripts necessary for analysis in the dada2 pipeline. T
 This R script is utilized to generate a phyloseq object from the output asv and tax tables from dada2. 
 
 ### decontam.R
-This R script is utilized to remove putative contaminants in samples based on taxa identified in positive and negative controls sequenced with samples. 
+This R script is utilized to remove putative contaminants in samples based on taxa identified in positive and negative controls sequenced with samples.
 
+### cross-over-effects.R
+This R script tests for cross over effects of both alpha and beta diversity based on treatment order. 
+
+### figure2.R
+This R script generates the relative abundance figure for fecal samples (Figure 2). 
+
+### figure3.R
+This R script generates the relative abundance figure for rumen samples (Figure 3). 
+
+### rel-abund-percents.R
+This R script generates percentages of taxa that are changed based on treatment. 
+
+### beta-diversity-figure4.R
+This R script generates p-values for beta diversity of fecal samples by treatment and generates the Principal Coordinate Analysis (PCA) plot for fecal samples (Figure 4).
+
+### beta-diversity-figure5.R
+This R script generates p-values for beta diversity of rumen samples by treatment and time and generates the PCA plot for rumen samples for treatment and time (Figure 5).
+
+### alpha-diversity-figure6.R
+This R script generates p-values for alpha diversity of fecal samples by treatment and generates the boxplot for fecal samples (Figure 6). 
+
+### alpha-diversity-figure7.R
+This R script generates p-values for alpha diversity of rumen samples by treatment and generates the boxplot for fecal samples (Figure 7). 
+
+### supplemental-figure1.R
+This R script generates the lineplot for alpha diversity of rumen samples by time (Supplemental Figure 1). 
+
+### DRA-ALDEx-Time.R
+This R script uses ALDEx2 to compare taxa based on time (H0 vs. H2 and H0 vs. H18) for rumen samples of both breeds. 
+
+### DRA-ALDEx-treatment.R
+This R script uses ALDEx2 to compare taxa between a Control Group and a *Capsicum* Group based on treatment for both fecal and rumen samples. 
 
