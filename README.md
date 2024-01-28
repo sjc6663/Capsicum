@@ -11,7 +11,7 @@ Analysis was done using the dada2 pipeline and downstream analysis was performed
 
 ### 1
 
-------------------
+
 ## Scripts
 
 ### bash scripts folder
