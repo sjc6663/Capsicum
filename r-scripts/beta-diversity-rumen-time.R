@@ -121,7 +121,7 @@ A <- H_rumen_rel %>%
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 5, fontface = "bold.italic", check_overlap = TRUE)) +
+  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Treatment, color = Treatment)) +
   theme_classic() +
@@ -134,7 +134,7 @@ B <- A_rumen_rel %>%
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 5, fontface = "bold.italic", check_overlap = TRUE)) +
+  ord_plot(color = "Treatment", shape = "Hour", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Treatment, color = Treatment)) +
   theme_classic() +
@@ -147,7 +147,7 @@ c <- H_rumen_rel %>%
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 5, fontface = "bold.italic", check_overlap = TRUE)) +
+  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
@@ -160,7 +160,7 @@ d <- A_rumen_rel %>%
   # when no distance matrix or constraints are supplied, PCA is the default/auto ordination method
   tax_transform(trans = "clr", rank = "Genus") %>%
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 5, fontface = "bold.italic", check_overlap = TRUE)) +
+  ord_plot(color = "Hour", shape = "Treatment", plot_taxa = 1:5, size = 5, tax_lab_style = tax_lab_style(type = "text", size = 3, fontface = "bold.italic", check_overlap = TRUE)) +
   scale_color_manual(values = c("#c5d280", "#ffc1b0", "#fdde9c", "#80cdc1", "#496e00")) +
   stat_ellipse(aes(group = Hour, color = Hour)) +
   theme_classic() +
@@ -171,7 +171,7 @@ d <- A_rumen_rel %>%
 
 (A|B)/(c|d)
 
-ggsave(filename = "plots/PCA-time-stuff.jpeg", dpi = 600, width = 12, height = 12)
+ggsave(filename = "plots/paper/figure-5.tiff", dpi = 300, width = 10, height = 10)
 
 # control capsicum time plots ----
 ##  PCA plot - fecal - holstein

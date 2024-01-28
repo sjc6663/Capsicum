@@ -133,8 +133,8 @@ hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
-tax_palette_plot(hierarchicalPal) +
-  theme(axis.text.y.left = element_text(family = "mono"))
+#tax_palette_plot(hierarchicalPal) +
+#  theme(axis.text.y.left = element_text(family = "mono"))
 
 # RPC5 Color Palette ----
 hueRank <- "Phylum"
@@ -189,8 +189,8 @@ hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
-tax_palette_plot(hierarchicalPal) +
-  theme(axis.text.y.left = element_text(family = "mono"))
+#tax_palette_plot(hierarchicalPal) +
+#  theme(axis.text.y.left = element_text(family = "mono"))
 
 # RPC10 Color Palette ----
 hueRank <- "Phylum"
@@ -245,8 +245,8 @@ hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
-tax_palette_plot(hierarchicalPal) +
-  theme(axis.text.y.left = element_text(family = "mono"))
+#tax_palette_plot(hierarchicalPal) +
+#  theme(axis.text.y.left = element_text(family = "mono"))
 
 # RPC15 Color Palette ----
 hueRank <- "Phylum"
@@ -301,8 +301,8 @@ hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
-tax_palette_plot(hierarchicalPal) +
-  theme(axis.text.y.left = element_text(family = "mono"))
+#tax_palette_plot(hierarchicalPal) +
+#  theme(axis.text.y.left = element_text(family = "mono"))
 
 # Control Plot ----
 A <- FC2 %>%
@@ -327,7 +327,7 @@ A <- FC2 %>%
   theme(legend.position = "none") +
   theme(text = element_text(size = 20))
 
-ggsave(plot = pC, filename = "plots/rel-abund-control-fecal.pdf", dpi = 600)
+#ggsave(plot = pC, filename = "plots/rel-abund-control-fecal.pdf", dpi = 600)
 
 
 # RPC5 Plot ----
@@ -352,7 +352,7 @@ B <- F52 %>%
   ) +
   theme(text = element_text(size = 20))
 
-ggsave(plot = p5, filename = "plots/rel-abund-rpc5-fecal.pdf", dpi = 600)
+#ggsave(plot = p5, filename = "plots/rel-abund-rpc5-fecal.pdf", dpi = 600)
 
 # RPC10 Plot ----
 
@@ -379,7 +379,7 @@ C <- F102 %>%
   theme(text = element_text(size = 20))
 
 
-ggsave(plot = p10, filename = "plots/rel-abund-rpc10-fecal.pdf", dpi = 600)
+#ggsave(plot = p10, filename = "plots/rel-abund-rpc10-fecal.pdf", dpi = 600)
 
 # RPC15 Plot ----
 
@@ -405,9 +405,9 @@ D <- F152 %>%
   theme(legend.position = "none") +
   theme(text = element_text(size = 20))
 
-ggsave(plot = p15, filename = "plots/rel-abund-rpc15-fecal.pdf", dpi = 600)
+#ggsave(plot = p15, filename = "plots/rel-abund-rpc15-fecal.pdf", dpi = 600)
 
 plots <- (A|B)/(C|D)
 plots
 
-ggsave(filename = "plots/rel-abund-fecal-all.jpeg", dpi = 600, width = 18, height = 12)
+ggsave(filename = "plots/paper/figure-2.tiff", dpi = 300, width = 13, height = 8)

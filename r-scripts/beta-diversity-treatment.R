@@ -91,7 +91,7 @@ A <- H_fecal_rel %>%
   stat_ellipse(aes(group = Treatment, color = Treatment)) +
   theme_classic() +
   ggtitle("A") +
-  #theme(legend.position = "none") +
+  theme(legend.position = "none") +
   labs(caption = "R2 = 0.52, P = 0.001***") +
   theme(text = element_text(size = 20))
 
@@ -117,7 +117,7 @@ ggsave(filename = "plots/PCA-microViz-angus-fecal.pdf", dpi = 600)
 
 A|B
 
-ggsave(filename = "plots/PCA-fecal-only.jpeg", dpi = 600, width = 12, height = 10)
+ggsave(filename = "plots/paper/figure-4.tiff", dpi = 300, width = 10, height = 10)
 
 ##  PCA plot - fecal - treatment
 sample_data(H_rumen_rel)$"Treatment" <- factor(sample_data(H_rumen_rel)$"Treatment", 

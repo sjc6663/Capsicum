@@ -84,7 +84,7 @@ B <- plot_richness(A_rumen_counts, x="Hour", measures=c("Shannon"), title = "B",
 
 A|B
 
-ggsave(filename = "plots/alpha-div-rumen-all.jpeg", dpi = 600)
+ggsave(filename = "plots/paper/figure-7.tiff", dpi = 300, width = 8, height = 7)
 
 
 # lineplot ----

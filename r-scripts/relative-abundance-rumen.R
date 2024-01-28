@@ -102,8 +102,8 @@ hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
-tax_palette_plot(hierarchicalPal) +
-  theme(axis.text.y.left = element_text(family = "mono"))
+#tax_palette_plot(hierarchicalPal) +
+ # theme(axis.text.y.left = element_text(family = "mono"))
 
 # RPC5 Color Palette ----
 hueRank <- "Phylum"
@@ -158,8 +158,8 @@ hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
-tax_palette_plot(hierarchicalPal) +
-  theme(axis.text.y.left = element_text(family = "mono"))
+#tax_palette_plot(hierarchicalPal) +
+ # theme(axis.text.y.left = element_text(family = "mono"))
 
 # RPC10 Color Palette ----
 hueRank <- "Phylum"
@@ -214,8 +214,8 @@ hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
-tax_palette_plot(hierarchicalPal) +
-  theme(axis.text.y.left = element_text(family = "mono"))
+#tax_palette_plot(hierarchicalPal) +
+ # theme(axis.text.y.left = element_text(family = "mono"))
 
 # RPC15 Color Palette ----
 hueRank <- "Phylum"
@@ -270,8 +270,8 @@ hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
-tax_palette_plot(hierarchicalPal) +
-  theme(axis.text.y.left = element_text(family = "mono"))
+#tax_palette_plot(hierarchicalPal) +
+ # theme(axis.text.y.left = element_text(family = "mono"))
 
 # Control Plot ----
 
@@ -298,9 +298,9 @@ A <- RC2 %>%
     labels = scales::label_percent()
   ) +
   theme(legend.position = "none") +
-  theme(text = element_text(size = 20))
+  theme(text = element_text(size = 12))
   
-ggsave(filename = "plots/rel-abund-control-rumen.pdf", dpi = 600, width = 12, height = 10)
+#ggsave(filename = "plots/rel-abund-control-rumen.pdf", dpi = 600, width = 12, height = 10)
 
 
 # RPC5 Plot ----
@@ -327,9 +327,9 @@ B <- R52 %>%
     expand = expansion(add = c(0, 0.1)), # axis starts exactly at 0
     labels = scales::label_percent()
   ) +
-  theme(text = element_text(size = 20))
+  theme(text = element_text(size = 12))
 
-ggsave(filename = "plots/rel-abund-rpc5-rumen.pdf", dpi = 600)
+#ggsave(filename = "plots/rel-abund-rpc5-rumen.pdf", dpi = 600)
 
 # RPC10 Plot ----
 sample_data(R102)$"Hour" <- factor(sample_data(R102)$"Hour", 
@@ -355,9 +355,9 @@ C <- R102 %>%
     labels = scales::label_percent()
   ) + 
   theme(legend.position = "none") +
-  theme(text = element_text(size = 20))
+  theme(text = element_text(size = 12))
 
-ggsave(filename = "plots/rel-abund-rpc10-rumen.pdf", dpi = 600)
+#ggsave(filename = "plots/rel-abund-rpc10-rumen.pdf", dpi = 600)
 
 # RPC15 Plot ----
 sample_data(R152)$"Hour" <- factor(sample_data(R152)$"Hour", 
@@ -383,12 +383,12 @@ D <- R152 %>%
     labels = scales::label_percent()
   ) + 
   theme(legend.position = "none") +
-  theme(text = element_text(size = 20))
+  theme(text = element_text(size = 12))
 
-ggsave(filename = "plots/rel-abund-rpc15-rumen.pdf", dpi = 600)
+#ggsave(filename = "plots/rel-abund-rpc15-rumen.pdf", dpi = 600)
 
 
 plots <- (A|B)/(C|D)
 plots
 
-ggsave(filename = "plots/paper-plots/fig3.jpeg", dpi = 600, width = 18, height = 12)
+ggsave(filename = "plots/paper/figure-3.tiff", dpi = 300, width = 11, height = 10)
