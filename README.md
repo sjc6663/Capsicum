@@ -21,10 +21,10 @@ This file contains the asv count information for all samples. This is an output 
 ### tax-table.RData
 This file contains the taxa information for all samples. This is an output file from dada2. 
 
-### phyloseq-fecal-counts.RData
+### phyloseq-fecal-samples-only.RData
 This is a phyloseq object of only fecal samples for both breeds. 
 
-### phyloseq-rumen-counts.RData
+### phyloseq-rumen-samples-only.RData
 This is a phyloseq object of only rumen samples for both breeds. 
 
 ## Scripts
