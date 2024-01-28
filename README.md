@@ -9,8 +9,13 @@ Analysis was done using the dada2 pipeline and downstream analysis was performed
 
 ## Data
 
-### 1
+### rawstats.txt
+This file contains information about the raw reads. Obtained by running seqkit stats in miniconda3. 
 
+### metadata.csv
+This file contains all the metadata for all samples. 
+
+### 1
 
 ## Scripts
 
